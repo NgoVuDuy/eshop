@@ -1,0 +1,19 @@
+package com.nvd.electroshop.exception;
+
+import com.nvd.electroshop.dto.ExceptionMessage;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+
+@RestControllerAdvice
+public class MainExceptionHandler {
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    public ExceptionMessage exceptionHandler(Exception e, WebRequest w) {
+
+        return new ExceptionMessage(0, e.getMessage());
+    }
+}
