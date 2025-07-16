@@ -1,5 +1,6 @@
 package com.nvd.electroshop.controller;
 
+import com.nvd.electroshop.dto.request.BrandRequest;
 import com.nvd.electroshop.entity.Brand;
 import com.nvd.electroshop.service.BrandService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +27,9 @@ public class BrandController {
     }
 
     @PostMapping
-    public Brand createBrand(@RequestBody Brand brand) {
+    public Brand createBrand(@RequestBody BrandRequest brandRequest) {
 
-        return brandService.createBrand(brand);
+        return brandService.createBrand(brandRequest);
     }
 
     @PutMapping
