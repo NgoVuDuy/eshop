@@ -33,4 +33,7 @@ public class Category {
     private Set<Brand> brands;
 
     // Một danh mục gồm nhiều sản phẩm
+    @ManyToMany(mappedBy = "categories")
+    @JsonIgnoreProperties("categories")
+    private Set<Product> products;
 }
