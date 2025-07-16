@@ -1,9 +1,12 @@
 package com.nvd.electroshop.controller;
 
+import com.nvd.electroshop.dto.request.CategoryRequest;
 import com.nvd.electroshop.entity.Category;
 import com.nvd.electroshop.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/categories")
@@ -25,9 +28,9 @@ public class CategoryController {
     }
 
     @PostMapping
-    public Category createCategory(@RequestBody Category category) {
+    public Category createCategory(@RequestBody CategoryRequest categoryRequest) {
 
-        return categoryService.createCategory(category);
+        return categoryService.createCategory(categoryRequest);
     }
 
     @PutMapping("{id}")

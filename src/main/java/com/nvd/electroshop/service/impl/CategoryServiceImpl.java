@@ -1,19 +1,26 @@
 package com.nvd.electroshop.service.impl;
 
+import com.nvd.electroshop.dto.request.CategoryRequest;
+import com.nvd.electroshop.entity.Brand;
 import com.nvd.electroshop.entity.Category;
+import com.nvd.electroshop.repository.BrandRepository;
 import com.nvd.electroshop.repository.CategoryRepository;
 import com.nvd.electroshop.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     CategoryRepository categoryRepository;
+    @Autowired
+    BrandRepository brandRepository;
 
     @Override
     public Iterable<Category> getAllCategories() {
@@ -35,7 +42,17 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category createCategory(Category category) {
+    public Category createCategory(CategoryRequest categoryRequest) {
+
+        Category category = new Category();
+        category.setName(categoryRequest.getCategory().getName());
+
+        Iterable<Brand> brandIterable = brandRepository.findAllById(categoryRequest.getBrandIds());
+
+        Set<Brand> brandSet = new HashSet<>();
+        brandIterable.forEach(brandSet::add);
+
+        category.setBrands(brandSet);
 
         return categoryRepository.save(category);
     }

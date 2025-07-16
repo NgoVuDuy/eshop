@@ -11,25 +11,20 @@ import lombok.Setter;
 import java.util.Set;
 
 @Entity
-@Table(name = "categories")
+@Table(name = "brands")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Category {
+public class Brand {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private  String name;
+    private String name;
 
-    // Một danh mục có nhiều hãng
-    @ManyToMany
-//    @JsonBackReference
-    @JsonIgnoreProperties("categories")
-    @JoinTable(
-            name = "category_brand",
-            joinColumns = @JoinColumn(name = "category_id"),
-            inverseJoinColumns = @JoinColumn(name = "brand_id")
-    )
-    private Set<Brand> brands;
+    // Một hãng có nhiều danh mục
+    @ManyToMany(mappedBy = "brands")
+//    @JsonManagedReference
+    @JsonIgnoreProperties("brands")
+    private Set<Category> categories;
 }

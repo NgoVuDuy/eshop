@@ -1,6 +1,6 @@
 package com.nvd.electroshop.exception;
 
-import com.nvd.electroshop.dto.ExceptionMessage;
+import com.nvd.electroshop.dto.response.ExceptionMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;

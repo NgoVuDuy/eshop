@@ -1,4 +1,4 @@
-package com.nvd.electroshop.dto;
+package com.nvd.electroshop.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
