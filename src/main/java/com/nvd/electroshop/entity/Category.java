@@ -24,7 +24,6 @@ public class Category {
 
     // Một danh mục có nhiều hãng
     @ManyToMany
-//    @JsonBackReference
     @JsonIgnoreProperties("categories")
     @JoinTable(
             name = "category_brand",
@@ -32,4 +31,6 @@ public class Category {
             inverseJoinColumns = @JoinColumn(name = "brand_id")
     )
     private Set<Brand> brands;
+
+    // Một danh mục gồm nhiều sản phẩm
 }

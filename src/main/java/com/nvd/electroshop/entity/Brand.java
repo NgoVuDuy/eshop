@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -27,4 +28,9 @@ public class Brand {
 //    @JsonManagedReference
     @JsonIgnoreProperties("brands")
     private Set<Category> categories;
+
+    // Một hãng có nhiều sản phẩm
+    @OneToMany(mappedBy = "brand")
+    @JsonManagedReference
+    List<Product> products;
 }

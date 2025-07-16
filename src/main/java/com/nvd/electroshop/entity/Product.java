@@ -1,5 +1,6 @@
 package com.nvd.electroshop.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -15,5 +16,10 @@ public class Product {
     private Double price;
 
     // Một sản phẩm thuộc về nhiều danh mục
-    // Một sản phẩm thuộc về một hãng
+
+    // Một hay nhiều sản phẩm thuộc về một hãng
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name = "brand_id")
+    Brand brand;
 }

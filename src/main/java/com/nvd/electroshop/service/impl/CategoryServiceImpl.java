@@ -47,12 +47,16 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = new Category();
         category.setName(categoryRequest.getCategory().getName());
 
-        Iterable<Brand> brandIterable = brandRepository.findAllById(categoryRequest.getBrandIds());
+        //
+        if(categoryRequest.getBrandIds() != null) {
 
-        Set<Brand> brandSet = new HashSet<>();
-        brandIterable.forEach(brandSet::add);
+            Iterable<Brand> brandIterable = brandRepository.findAllById(categoryRequest.getBrandIds());
 
-        category.setBrands(brandSet);
+            Set<Brand> brandSet = new HashSet<>();
+            brandIterable.forEach(brandSet::add);
+
+            category.setBrands(brandSet);
+        }
 
         return categoryRepository.save(category);
     }
