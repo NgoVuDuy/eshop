@@ -6,24 +6,23 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "attribute_product")
-public class AttributeProduct {
+@Table(name = "wishlists")
+public class Wishlist {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Quan hệ tới bảng product
+
+    // Một danh sách yêu thích thuộc về một người dùng
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonBackReference
+    private User user;
+
+    // Một danh sách yêu thích thuộc về một sản phẩm
     @ManyToOne
     @JoinColumn(name = "product_id")
     @JsonBackReference
     private Product product;
-
-    // Quan hệ tới bảng attribute
-    @ManyToOne
-    @JoinColumn(name = "attribute_id")
-    @JsonBackReference
-    private Attribute attribute;
-
-    private Double value;
 }

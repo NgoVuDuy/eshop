@@ -18,6 +18,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private Long stockQuantity;
     private Double price;
 
     // Một hay nhiều sản phẩm thuộc về một hãng
@@ -46,4 +47,23 @@ public class Product {
     @OneToMany(mappedBy = "product")
     private List<ProductImage> productImages;
 
+    // Một sản phẩm gồm nhiều chi tiết giỏ hàng
+    @OneToMany(mappedBy = "product")
+    @JsonManagedReference
+    private List<CartItem> cartItems;
+
+    // Một sản phẩm thuộc về nhiều chi tiết đơn hàng
+    @OneToMany(mappedBy = "product")
+    @JsonManagedReference
+    private List<OrderItem> orderItems;
+
+    // Một sản phẩm có nhiều đánh giá
+    @OneToMany(mappedBy = "product")
+    @JsonManagedReference
+    private List<Reviews> reviews;
+
+    // Một sản phẩm có nhiều lượt yêu thích
+    @OneToMany(mappedBy = "product")
+    @JsonManagedReference
+    private List<Wishlist> wishlists;
 }
