@@ -36,4 +36,14 @@ public class Category {
     @ManyToMany(mappedBy = "categories")
     @JsonIgnoreProperties("categories")
     private Set<Product> products;
+
+    // Một danh mục chứa nhiều thuộc tính sản phẩm
+    @ManyToMany
+    @JoinTable(
+            name = "attribute_category",
+            joinColumns = @JoinColumn(name = "category_id"),
+            inverseJoinColumns = @JoinColumn(name = "attribute_id")
+    )
+    @JsonIgnoreProperties("categories")
+    private Set<Attribute> attributes;
 }
