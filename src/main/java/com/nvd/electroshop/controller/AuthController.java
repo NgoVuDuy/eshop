@@ -1,6 +1,8 @@
 package com.nvd.electroshop.controller;
 
 import com.nvd.electroshop.dto.request.AuthRequest;
+import com.nvd.electroshop.dto.request.VerifyRequest;
+import com.nvd.electroshop.dto.response.AuthResponse;
 import com.nvd.electroshop.dto.response.Message;
 import com.nvd.electroshop.entity.User;
 import com.nvd.electroshop.service.AuthService;
@@ -24,8 +26,14 @@ public class AuthController {
     }
 
     @PostMapping("login")
-    public User login (@RequestBody AuthRequest authRequest) {
+    public AuthResponse login (@RequestBody AuthRequest authRequest) {
 
         return authService.login(authRequest);
+    }
+
+    @PostMapping("token/verify")
+    public Message verifyToken(@RequestBody VerifyRequest verifyRequest) {
+
+        return authService.verifyToken(verifyRequest);
     }
 }
