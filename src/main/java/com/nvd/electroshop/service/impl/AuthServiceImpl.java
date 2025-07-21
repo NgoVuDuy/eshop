@@ -12,8 +12,10 @@ import com.nvd.electroshop.dto.response.Message;
 import com.nvd.electroshop.entity.User;
 import com.nvd.electroshop.repository.AuthRepository;
 import com.nvd.electroshop.service.AuthService;
+//import lombok.Value;
 import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,9 +35,8 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @NonFinal
-    String signer = "t/6AGNR5sjSgKGQ3CGywkmvrJ/Rp9OMYxUZlgaYJeE8JrUU1lx0KCAhQ1m+Ic1qn";
-
+    @Value("${jwt.secretKey}")
+    private String secretKey;
 
     @Override
     public Message register(AuthRequest authRequest) {
@@ -103,7 +104,7 @@ public class AuthServiceImpl implements AuthService {
         JWSObject jwsObject = new JWSObject(jwsHeader, payload);
 
         try {
-            JWSSigner jwsSigner = new MACSigner(signer.getBytes());
+            JWSSigner jwsSigner = new MACSigner(secretKey.getBytes());
 
             jwsObject.sign(jwsSigner);
 
@@ -125,7 +126,7 @@ public class AuthServiceImpl implements AuthService {
             SignedJWT signedJWT = SignedJWT.parse(token);
 
             // Tạo verifier
-            JWSVerifier jwsVerifier = new MACVerifier(signer.getBytes());
+            JWSVerifier jwsVerifier = new MACVerifier(secretKey.getBytes());
 
             // Kiểm tra hết hạn
             boolean isExpiry = signedJWT.getJWTClaimsSet()
