@@ -10,6 +10,7 @@ import com.nvd.electroshop.dto.request.VerifyRequest;
 import com.nvd.electroshop.dto.response.AuthResponse;
 import com.nvd.electroshop.dto.response.Message;
 import com.nvd.electroshop.entity.User;
+import com.nvd.electroshop.enums.Role;
 import com.nvd.electroshop.repository.AuthRepository;
 import com.nvd.electroshop.service.AuthService;
 //import lombok.Value;
@@ -25,6 +26,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Optional;
+import java.util.StringJoiner;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -52,6 +54,7 @@ public class AuthServiceImpl implements AuthService {
         User user = User.builder()
                 .username(authRequest.getUsername())
                 .password(passwordEd)
+                .role(authRequest.getRole())
                 .build();
 
         authRepository.save(user);
@@ -75,7 +78,7 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Tên tài khoản hoặc mật khẩu không đúng");
         }
 
-        String token = generateToken(authRequest.getUsername());
+        String token = generateToken(user);
 
         return AuthResponse.builder()
                 .status(1)
@@ -85,18 +88,18 @@ public class AuthServiceImpl implements AuthService {
     }
 
     // Tạo token
-    public String generateToken(String username) {
+    public String generateToken(User user) {
 
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
 
 //        System.out.println(jwsHeader);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(username)
+                .subject(user.getUsername())
                 .issuer("eshop.com")
                 .issueTime(new Date())
                 .expirationTime(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
-
+                .claim("scope", user.getRole())
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
@@ -116,6 +119,21 @@ public class AuthServiceImpl implements AuthService {
         }
 
     }
+
+//    private String getScopes(User user) {
+//
+//        StringJoiner stringJoiner = new StringJoiner(" ");
+//
+//        if(user.getRoles() != null) {
+//
+//            user.getRoles().forEach(role -> {
+//                stringJoiner.add(role.toString());
+//            });
+//        }
+//
+//        return stringJoiner.toString();
+//    }
+
     // Xác thực token
     public Message verifyToken(VerifyRequest verifyRequest) {
 

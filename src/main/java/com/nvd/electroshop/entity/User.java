@@ -1,6 +1,7 @@
 package com.nvd.electroshop.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.nvd.electroshop.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -29,7 +31,8 @@ public class User {
     private String address;
     private LocalDate birthDate;
 
-    private boolean isAdmin;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     // Một người dùng có một giỏ hàng
     @OneToOne(mappedBy = "user")

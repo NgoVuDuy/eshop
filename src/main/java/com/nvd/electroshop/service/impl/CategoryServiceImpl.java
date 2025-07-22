@@ -7,6 +7,7 @@ import com.nvd.electroshop.repository.BrandRepository;
 import com.nvd.electroshop.repository.CategoryRepository;
 import com.nvd.electroshop.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
