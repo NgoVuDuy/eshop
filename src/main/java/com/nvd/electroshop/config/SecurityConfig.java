@@ -1,5 +1,6 @@
 package com.nvd.electroshop.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,42 +24,34 @@ import javax.crypto.spec.SecretKeySpec;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final String[] PERMIT_END_POINTS = {"/auth/**"} ;
+    private final String[] PERMIT_END_POINTS = {
 
-    @Value("${jwt.secretKey}")
-    private String secretKey;
+            "/auth/**",
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/v3/api-docs.yaml",
+            "/swagger-resources/**",
+            "/webjars/**"} ;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-
-        return new BCryptPasswordEncoder();
-    }
+    @Autowired
+    private JwtDecoder jwtDecoder;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // Nếu bạn dùng REST API
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(PERMIT_END_POINTS).permitAll() // ✅ Cho phép không cần login
+                        .requestMatchers(PERMIT_END_POINTS).permitAll()
 //                        .requestMatchers(HttpMethod.GET, "/categories").hasAuthority("SCOPE_ADMIN")
                         .anyRequest().authenticated() // Những đường khác thì cần login
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwtConfigurer -> jwtConfigurer
-                                .decoder(jwtDecoder())))
-                .httpBasic(Customizer.withDefaults()); // hoặc dùng formLogin() tùy bạn
+                                .decoder(jwtDecoder)))
+                .httpBasic(Customizer.withDefaults()); // hoặc dùng formLogin()
 
         return http.build();
     }
 
-    @Bean
-    public JwtDecoder jwtDecoder() {
-
-        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HS512");
-
-        NimbusJwtDecoder nimbusJwtDecoder = NimbusJwtDecoder.withSecretKey(secretKeySpec).macAlgorithm(MacAlgorithm.HS512).build();
-
-        return nimbusJwtDecoder;
-
-    }
 }

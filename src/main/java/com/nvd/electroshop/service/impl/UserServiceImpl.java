@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
             if(userDetails.getRole() != null) user.setRole(userDetails.getRole());
 
             if(userDetails.getUsername() != null) user.setUsername(userDetails.getUsername());
-            if(userDetails.getPassword() != null) user.setPassword(userDetails.getPassword());
+            if(userDetails.getPassword() != null) user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
 
             return new ApiResponse<>(1, userRepository.save(user));
         } else {
@@ -143,7 +143,7 @@ public class UserServiceImpl implements UserService {
                 if(!passwordEncoder.matches(updateUserRequest.getOldPassword(), user.getPassword())) {
                     throw new RuntimeException("Mật khẩu không trùng khớp");
                 } else {
-                    user.setPassword(updateUserRequest.getPassword());
+                    user.setPassword(passwordEncoder.encode(updateUserRequest.getPassword()));
                 }
             }
 
