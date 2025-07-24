@@ -1,14 +1,18 @@
 package com.nvd.electroshop.controller;
 
 import com.nvd.electroshop.dto.request.UpdateUserRequest;
+import com.nvd.electroshop.dto.request.UserRequest;
 import com.nvd.electroshop.dto.response.ApiResponse;
 import com.nvd.electroshop.dto.response.Message;
+import com.nvd.electroshop.dto.response.UserReponse;
 import com.nvd.electroshop.entity.User;
 import com.nvd.electroshop.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -20,30 +24,30 @@ public class UserController {
     @GetMapping
     // Admin
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<ApiResponse<Iterable<User>>> getAllUsers() {
+    public ResponseEntity<ApiResponse<List<UserReponse>>> getAllUsers() {
 
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<ApiResponse<User>> getUserById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<UserReponse>> getUserById(@PathVariable Long id) {
 
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @PostMapping
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<ApiResponse<User>> createUser(@RequestBody User user) {
+    public ResponseEntity<ApiResponse<UserReponse>> createUser(@RequestBody UserRequest userRequest) {
 
-        return ResponseEntity.ok(userService.createUser(user));
+        return ResponseEntity.ok(userService.createUser(userRequest));
     }
 
     @PutMapping("{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<ApiResponse<User>> updateUser(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<ApiResponse<UserReponse>> updateUser(@PathVariable Long id, @RequestBody UserRequest userRequest) {
 
-        return ResponseEntity.ok(userService.updateUser(id, user));
+        return ResponseEntity.ok(userService.updateUser(id, userRequest));
     }
 
     @DeleteMapping("{id}")
@@ -55,14 +59,14 @@ public class UserController {
 
     @GetMapping("/profile")
     // User
-    public ResponseEntity<ApiResponse<User>> getProfile() {
+    public ResponseEntity<ApiResponse<UserReponse>> getProfile() {
 
         return ResponseEntity.ok(userService.getProfile());
     }
 
     @PutMapping("/update")
     //user
-    public ResponseEntity<ApiResponse<User>> updateProfile(@RequestBody UpdateUserRequest updateUserRequest) {
+    public ResponseEntity<ApiResponse<UserReponse>> updateProfile(@RequestBody UpdateUserRequest updateUserRequest) {
 
         return ResponseEntity.ok(userService.updateProfile(updateUserRequest));
     }

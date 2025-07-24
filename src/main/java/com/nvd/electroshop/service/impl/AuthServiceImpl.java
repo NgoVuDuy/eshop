@@ -7,6 +7,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.nvd.electroshop.dto.request.AuthRequest;
 import com.nvd.electroshop.dto.request.VerifyRequest;
+import com.nvd.electroshop.dto.response.ApiResponse;
 import com.nvd.electroshop.dto.response.AuthResponse;
 import com.nvd.electroshop.dto.response.Message;
 import com.nvd.electroshop.entity.User;
@@ -59,7 +60,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthResponse login(AuthRequest authRequest) {
+    public ApiResponse<AuthResponse> login(AuthRequest authRequest) {
 
         Optional<User> userOptional = authRepository.findByUsername(authRequest.getUsername());
 
@@ -76,11 +77,11 @@ public class AuthServiceImpl implements AuthService {
 
         String token = generateToken(user);
 
-        return AuthResponse.builder()
-                .status(1)
-                .message("Đăng nhập thành công")
-                .token(token)
-                .build();
+        return new ApiResponse<>(1,
+                AuthResponse.builder()
+                        .token(token)
+                        .build()
+                );
     }
 
     // Tạo token

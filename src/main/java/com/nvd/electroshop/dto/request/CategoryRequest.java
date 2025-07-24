@@ -13,6 +13,9 @@ import java.util.List;
 @NoArgsConstructor
 public class CategoryRequest {
 
-    private Category category;
+    private Long id;
+    private String name;
+
     private List<Long> brandIds;
+    private List<Long> attributeIds;
 }

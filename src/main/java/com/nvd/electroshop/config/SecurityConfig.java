@@ -27,12 +27,14 @@ public class SecurityConfig {
     private final String[] PERMIT_END_POINTS = {
 
             "/auth/**",
-            "/swagger-ui.html",
+
             "/swagger-ui/**",
             "/v3/api-docs/**",
-            "/v3/api-docs.yaml",
-            "/swagger-resources/**",
-            "/webjars/**"} ;
+//            "/swagger-ui.html",
+//            "/v3/api-docs.yaml",
+//            "/swagger-resources/**",
+//            "/webjars/**"
+    } ;
 
     @Autowired
     private JwtDecoder jwtDecoder;

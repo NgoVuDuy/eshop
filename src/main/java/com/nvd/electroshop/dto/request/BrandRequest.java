@@ -9,5 +9,6 @@ import java.util.List;
 public class BrandRequest {
 
     private Brand brand;
+
     private List<Long> categoryIds;
 }

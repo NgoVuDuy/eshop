@@ -1,8 +1,10 @@
 package com.nvd.electroshop.service.impl;
 
 import com.nvd.electroshop.dto.request.UpdateUserRequest;
+import com.nvd.electroshop.dto.request.UserRequest;
 import com.nvd.electroshop.dto.response.ApiResponse;
 import com.nvd.electroshop.dto.response.Message;
+import com.nvd.electroshop.dto.response.UserReponse;
 import com.nvd.electroshop.entity.User;
 import com.nvd.electroshop.repository.UserRepository;
 import com.nvd.electroshop.service.UserService;
@@ -13,6 +15,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,57 +30,115 @@ public class UserServiceImpl implements UserService {
 
     @Override
     // Admin
-    public ApiResponse<Iterable<User>> getAllUsers() {
+    public ApiResponse<List<UserReponse>> getAllUsers() {
 
-        return new ApiResponse<>(1, userRepository.findAll());
+        List<User> userIterable = userRepository.findAll();
+
+        List<UserReponse> userReponseList = new ArrayList<>();
+
+        userIterable.forEach(user -> {
+
+            UserReponse userReponse = UserReponse.builder()
+                    .username(user.getUsername())
+                    .phone(user.getPhone())
+                    .address(user.getAddress())
+                    .birthDate(user.getBirthDate())
+                    .role(user.getRole())
+                    .build();
+
+            userReponseList.add(userReponse);
+        });
+
+        return new ApiResponse<>(1, userReponseList);
     }
 
     @Override
     // Admin
-    public ApiResponse<User> getUserById(Long id) {
+    public ApiResponse<UserReponse> getUserById(Long id) {
 
         Optional<User> userOptional = userRepository.findById(id);
 
-        if(userOptional.isPresent()) {
-            User user = userOptional.get();
-
-            return new ApiResponse<>(1, user);
-        } else {
-
+        if(userOptional.isEmpty()) {
             throw new RuntimeException("Không tìm thấy người dùng để lấy thông tin");
+
         }
+
+        User user = userOptional.get();
+
+        UserReponse userReponse = UserReponse.builder()
+                .username(user.getUsername())
+                .phone(user.getPhone())
+                .address(user.getAddress())
+                .birthDate(user.getBirthDate())
+                .role(user.getRole())
+                .build();
+
+        return new ApiResponse<>(1, userReponse);
     }
 
     @Override
     // Admin
-    public ApiResponse<User> createUser(User user) {
+    public ApiResponse<UserReponse> createUser(UserRequest userRequest) {
 
-        return new ApiResponse<>(1, userRepository.save(user));
+        if (userRepository.existsByUsername(userRequest.getUsername())) {
+
+            throw new RuntimeException("Tên người dùng đã tồn tại");
+        }
+        User user = User.builder()
+                .username(userRequest.getUsername())
+                .password(userRequest.getPassword())
+                .phone(userRequest.getPhone())
+                .address(userRequest.getAddress())
+                .birthDate(userRequest.getBirthDate())
+                .role(userRequest.getRole())
+                .build();
+
+        user = userRepository.save(user);
+
+        UserReponse userReponse = UserReponse.builder()
+                .username(user.getUsername())
+                .phone(user.getPhone())
+                .address(user.getAddress())
+                .birthDate(user.getBirthDate())
+                .role(user.getRole())
+                .build();
+
+        return new ApiResponse<>(1, userReponse);
     }
 
     @Override
     // Admin
-    public ApiResponse<User> updateUser(Long id, User userDetails) {
+    public ApiResponse<UserReponse> updateUser(Long id, UserRequest userRequest) {
 
         Optional<User> userOptional = userRepository.findById(id);
 
-        if(userOptional.isPresent()) {
-
-            User user = userOptional.get();
-
-            if(userDetails.getPhone() != null) user.setPhone(userDetails.getPhone());
-            if(userDetails.getAddress() != null) user.setAddress(userDetails.getAddress());
-            if(userDetails.getBirthDate() != null) user.setBirthDate(userDetails.getBirthDate());
-            if(userDetails.getRole() != null) user.setRole(userDetails.getRole());
-
-            if(userDetails.getUsername() != null) user.setUsername(userDetails.getUsername());
-            if(userDetails.getPassword() != null) user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
-
-            return new ApiResponse<>(1, userRepository.save(user));
-        } else {
+        if(userOptional.isEmpty()) {
 
             throw new RuntimeException("Không tìm thấy người dùng để cập nhật");
+
         }
+
+        User user = userOptional.get();
+
+        if(userRequest.getPhone() != null) user.setPhone(userRequest.getPhone());
+        if(userRequest.getAddress() != null) user.setAddress(userRequest.getAddress());
+        if(userRequest.getBirthDate() != null) user.setBirthDate(userRequest.getBirthDate());
+        if(userRequest.getRole() != null) user.setRole(userRequest.getRole());
+
+        if(userRequest.getUsername() != null) user.setUsername(userRequest.getUsername());
+        if(userRequest.getPassword() != null) user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+
+        user = userRepository.save(user);
+
+        UserReponse userReponse = UserReponse.builder()
+                .username(user.getUsername())
+                .phone(user.getPhone())
+                .address(user.getAddress())
+                .birthDate(user.getBirthDate())
+                .role(user.getRole())
+                .build();
+
+        return new ApiResponse<>(1, userReponse);
     }
 
     @Override
@@ -97,7 +159,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     // User
-    public ApiResponse<User> getProfile() {
+    public ApiResponse<UserReponse> getProfile() {
 
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
@@ -105,18 +167,27 @@ public class UserServiceImpl implements UserService {
 
         Optional<User> userOptional = userRepository.findByUsername(username);
 
-        if (userOptional.isPresent()) {
-
-            return new ApiResponse<>(1, userOptional.get());
-        } else {
+        if (userOptional.isEmpty()) {
 
             throw new RuntimeException("Không tìm thấy người dùng");
         }
+
+        User user = userOptional.get();
+
+        UserReponse userReponse = UserReponse.builder()
+                .username(user.getUsername())
+                .phone(user.getPhone())
+                .address(user.getAddress())
+                .birthDate(user.getBirthDate())
+                .role(user.getRole())
+                .build();
+
+        return new ApiResponse<>(1, userReponse);
     }
 
     @Override
     // User
-    public ApiResponse<User> updateProfile(UpdateUserRequest updateUserRequest) {
+    public ApiResponse<UserReponse> updateProfile(UpdateUserRequest updateUserRequest) {
 
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
@@ -124,39 +195,48 @@ public class UserServiceImpl implements UserService {
 
         Optional<User> userOptional = userRepository.findByUsername(username);
 
-        if (userOptional.isPresent()) {
-
-            User user = userOptional.get();
-
-            if(updateUserRequest.getUsername() != null) {
-
-                if (userRepository.existsByUsername(updateUserRequest.getUsername())) {
-                    throw new RuntimeException("Tên người dùng đã tồn tại");
-                } else {
-
-                    user.setUsername(updateUserRequest.getUsername());
-                }
-            }
-
-            if(updateUserRequest.getPassword() != null && updateUserRequest.getOldPassword() != null) {
-
-                if(!passwordEncoder.matches(updateUserRequest.getOldPassword(), user.getPassword())) {
-                    throw new RuntimeException("Mật khẩu không trùng khớp");
-                } else {
-                    user.setPassword(passwordEncoder.encode(updateUserRequest.getPassword()));
-                }
-            }
-
-            if(updateUserRequest.getPhone() != null) user.setPhone(updateUserRequest.getPhone());
-            if(updateUserRequest.getAddress() != null) user.setAddress(updateUserRequest.getAddress());
-            if(updateUserRequest.getBirthDate() != null) user.setBirthDate(updateUserRequest.getBirthDate());
-
-            return new ApiResponse<>(1, userRepository.save(user));
-
-        } else {
+        if (userOptional.isEmpty()) {
 
             throw new RuntimeException("Không tìm thấy người dùng để cập nhật");
         }
+
+        User user = userOptional.get();
+
+        if(updateUserRequest.getUsername() != null) {
+
+            if (userRepository.existsByUsername(updateUserRequest.getUsername())) {
+                throw new RuntimeException("Tên người dùng đã tồn tại");
+            } else {
+
+                user.setUsername(updateUserRequest.getUsername());
+            }
+        }
+
+        if(updateUserRequest.getPassword() != null && updateUserRequest.getOldPassword() != null) {
+
+            if(!passwordEncoder.matches(updateUserRequest.getOldPassword(), user.getPassword())) {
+                throw new RuntimeException("Mật khẩu không trùng khớp");
+            } else {
+                user.setPassword(passwordEncoder.encode(updateUserRequest.getPassword()));
+            }
+        }
+
+        if(updateUserRequest.getPhone() != null) user.setPhone(updateUserRequest.getPhone());
+        if(updateUserRequest.getAddress() != null) user.setAddress(updateUserRequest.getAddress());
+        if(updateUserRequest.getBirthDate() != null) user.setBirthDate(updateUserRequest.getBirthDate());
+
+        user = userRepository.save(user);
+
+        UserReponse userReponse = UserReponse.builder()
+                .username(user.getUsername())
+                .phone(user.getPhone())
+                .address(user.getAddress())
+                .birthDate(user.getBirthDate())
+                .role(user.getRole())
+                .build();
+
+        return new ApiResponse<>(1, userReponse);
+
     }
 
     @Override
