@@ -11,10 +11,11 @@ import java.util.List;
 @AllArgsConstructor
 public class AttributeRequest {
 
-    private Long id;
+//    private Long id;
     private String name;
     private String unit;
 
     private List<Long> categoryIds;
+//    private List<Long> productIds;
 
 }

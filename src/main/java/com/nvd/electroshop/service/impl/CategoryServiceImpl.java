@@ -2,6 +2,8 @@ package com.nvd.electroshop.service.impl;
 
 import com.nvd.electroshop.dto.request.CategoryRequest;
 import com.nvd.electroshop.dto.response.ApiResponse;
+import com.nvd.electroshop.dto.response.AttributeResponse;
+import com.nvd.electroshop.dto.response.BrandResponse;
 import com.nvd.electroshop.dto.response.CategoryResponse;
 import com.nvd.electroshop.entity.Attribute;
 import com.nvd.electroshop.entity.Brand;
@@ -130,7 +132,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public ApiResponse<Set<Brand>> getBrandsByCategoryId(Long id) {
+    public ApiResponse<Set<BrandResponse>> getBrandsByCategoryId(Long id) {
 
         Optional<Category> categoryOptional = categoryRepository.findById(id);
 
@@ -139,17 +141,40 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         Category category = categoryOptional.get();
-
         Set<Brand> brands = category.getBrands();
 
-        return new ApiResponse<>(1, brands);
+        Set<BrandResponse> brandResponseSet = new HashSet<>();
+
+        for (Brand brand : brands) {
+
+            BrandResponse brandResponse = new BrandResponse(brand.getId(), brand.getName());
+            brandResponseSet.add(brandResponse);
+        }
+
+        return new ApiResponse<>(1, brandResponseSet);
     }
 
     @Override
-    public ApiResponse<Set<Attribute>> getAttributesByCategoryId(Long id) {
+    public ApiResponse<Set<AttributeResponse>> getAttributesByCategoryId(Long id) {
 
+        Optional<Category> categoryOptional = categoryRepository.findById(id);
 
+        if(categoryOptional.isEmpty()) {
+            throw new RuntimeException("Không tìm thấy danh mục");
+        }
 
-        return null;
+        Category category = categoryOptional.get();
+
+        Set<Attribute> attributes = category.getAttributes();
+
+        Set<AttributeResponse> attributeResponseSet = new HashSet<>();
+
+        for (Attribute attribute : attributes) {
+
+            AttributeResponse attributeResponse = new AttributeResponse(attribute.getId(), attribute.getName(), attribute.getUnit());
+            attributeResponseSet.add(attributeResponse);
+        }
+
+        return new ApiResponse<>(1, attributeResponseSet);
     }
 }

@@ -2,7 +2,10 @@ package com.nvd.electroshop.controller;
 
 import com.nvd.electroshop.dto.request.CategoryRequest;
 import com.nvd.electroshop.dto.response.ApiResponse;
+import com.nvd.electroshop.dto.response.AttributeResponse;
+import com.nvd.electroshop.dto.response.BrandResponse;
 import com.nvd.electroshop.dto.response.CategoryResponse;
+import com.nvd.electroshop.entity.Attribute;
 import com.nvd.electroshop.entity.Brand;
 import com.nvd.electroshop.entity.Category;
 import com.nvd.electroshop.service.CategoryService;
@@ -55,9 +58,15 @@ public class CategoryController {
     }
 
     @GetMapping("{id}/brands")
-    public ResponseEntity<ApiResponse<Set<Brand>>> getBrandsByCategoryId(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Set<BrandResponse>>> getBrandsByCategoryId(@PathVariable Long id) {
 
         return ResponseEntity.ok(categoryService.getBrandsByCategoryId(id));
+    }
+
+    @GetMapping("{id}/attributes")
+    public ResponseEntity<ApiResponse<Set<AttributeResponse>>> getAttributesByCategoryId(@PathVariable Long id) {
+
+        return ResponseEntity.ok(categoryService.getAttributesByCategoryId(id));
     }
 
 }

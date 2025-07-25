@@ -1,9 +1,14 @@
 package com.nvd.electroshop.controller;
 
 import com.nvd.electroshop.dto.request.BrandRequest;
+import com.nvd.electroshop.dto.response.ApiResponse;
+import com.nvd.electroshop.dto.response.BrandResponse;
+import com.nvd.electroshop.dto.response.Message;
 import com.nvd.electroshop.entity.Brand;
 import com.nvd.electroshop.service.BrandService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,30 +21,33 @@ public class BrandController {
     BrandService brandService;
 
     @GetMapping
-    public Iterable<Brand> getAllBrands() {
+    public ResponseEntity<ApiResponse<List<BrandResponse>>> getAllBrands() {
 
-        return brandService.getAllBrands();
+        return ResponseEntity.ok( brandService.getAllBrands()) ;
     }
 
     @GetMapping("{id}")
-    public Brand getBrandById(@PathVariable Long id) {
-        return brandService.getBrandById(id);
+    public ResponseEntity<ApiResponse<BrandResponse>> getBrandById(@PathVariable Long id) {
+        return ResponseEntity.ok(brandService.getBrandById(id)) ;
     }
 
     @PostMapping
-    public Brand createBrand(@RequestBody BrandRequest brandRequest) {
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public ResponseEntity<ApiResponse<BrandResponse>> createBrand(@RequestBody BrandRequest brandRequest) {
 
-        return brandService.createBrand(brandRequest);
+        return ResponseEntity.ok(brandService.createBrand(brandRequest));
     }
 
     @PutMapping
-    public Brand updateBrand(@PathVariable Long id, @RequestBody Brand brand) {
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public ResponseEntity<ApiResponse<BrandResponse>> updateBrand(@PathVariable Long id, @RequestBody BrandRequest brandRequest) {
 
-        return brandService.updateBrand(id, brand);
+        return ResponseEntity.ok(brandService.updateBrand(id, brandRequest)) ;
     }
     @DeleteMapping("{id}")
-    public void deleteBrand(@PathVariable Long id) {
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public ResponseEntity<Message> deleteBrand(@PathVariable Long id) {
 
-        brandService.deleteBrand(id);
+        return ResponseEntity.ok(brandService.deleteBrand(id));
     }
 }
