@@ -6,6 +6,7 @@ import com.nvd.electroshop.dto.response.AttributeResponse;
 import com.nvd.electroshop.dto.response.Message;
 import com.nvd.electroshop.entity.Attribute;
 import com.nvd.electroshop.entity.Category;
+import com.nvd.electroshop.entity.ProductImage;
 import com.nvd.electroshop.repository.AttributeRepository;
 import com.nvd.electroshop.repository.CategoryRepository;
 import com.nvd.electroshop.service.AttributeService;
@@ -35,8 +36,6 @@ public class AttributeServiceImpl implements AttributeService {
                 new AttributeResponse(attribute.getId(), attribute.getName(), attribute.getUnit())
 
                 ).toList();
-
-
 
         return new ApiResponse<>(1, attributeResponses);
     }
