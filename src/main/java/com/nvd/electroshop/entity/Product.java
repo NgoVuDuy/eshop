@@ -4,16 +4,14 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "products")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -66,7 +64,7 @@ public class Product {
     // Một sản phẩm có nhiều đánh giá
     @OneToMany(mappedBy = "product")
     @JsonManagedReference
-    private List<Reviews> reviews;
+    private List<Review> reviews;
 
     // Một sản phẩm có nhiều lượt yêu thích
     @OneToMany(mappedBy = "product")

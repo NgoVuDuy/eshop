@@ -2,12 +2,16 @@ package com.nvd.electroshop.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "reviews")
-public class Reviews {
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

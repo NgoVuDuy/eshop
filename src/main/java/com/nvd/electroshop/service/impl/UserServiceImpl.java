@@ -39,6 +39,7 @@ public class UserServiceImpl implements UserService {
         userIterable.forEach(user -> {
 
             UserReponse userReponse = UserReponse.builder()
+                    .id(user.getId())
                     .username(user.getUsername())
                     .phone(user.getPhone())
                     .address(user.getAddress())
@@ -66,6 +67,7 @@ public class UserServiceImpl implements UserService {
         User user = userOptional.get();
 
         UserReponse userReponse = UserReponse.builder()
+                .id(user.getId())
                 .username(user.getUsername())
                 .phone(user.getPhone())
                 .address(user.getAddress())

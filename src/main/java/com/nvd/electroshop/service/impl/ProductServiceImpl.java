@@ -43,7 +43,6 @@ public class ProductServiceImpl implements ProductService {
 
         products.forEach(product -> {
 
-
             Brand brand = product.getBrand();
             BrandResponse brandResponse = BrandResponse.builder()
                     .id(brand.getId())
