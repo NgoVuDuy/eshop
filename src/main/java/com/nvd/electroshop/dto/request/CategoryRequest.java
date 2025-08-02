@@ -18,4 +18,5 @@ public class CategoryRequest {
 
     private List<Long> brandIds;
     private List<Long> attributeIds;
+//    private List<Long> productIds;
 }

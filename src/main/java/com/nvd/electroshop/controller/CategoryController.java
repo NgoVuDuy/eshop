@@ -1,10 +1,7 @@
 package com.nvd.electroshop.controller;
 
 import com.nvd.electroshop.dto.request.CategoryRequest;
-import com.nvd.electroshop.dto.response.ApiResponse;
-import com.nvd.electroshop.dto.response.AttributeResponse;
-import com.nvd.electroshop.dto.response.BrandResponse;
-import com.nvd.electroshop.dto.response.CategoryResponse;
+import com.nvd.electroshop.dto.response.*;
 import com.nvd.electroshop.entity.Attribute;
 import com.nvd.electroshop.entity.Brand;
 import com.nvd.electroshop.entity.Category;
@@ -25,15 +22,15 @@ public class CategoryController {
     CategoryService categoryService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<CategoryResponse>>> getAllCategories() {
+    public ResponseEntity<ApiResponse<List<CategoryResponse>>> getAllCategories(@RequestParam(value = "include", required = false) List<String> includes) {
 
-        return ResponseEntity.ok(categoryService.getAllCategories()) ;
+        return ResponseEntity.ok(categoryService.getAllCategories(includes)) ;
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<ApiResponse<CategoryResponse>> getCategoryById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<CategoryResponse>> getCategoryById(@PathVariable Long id, @RequestParam(value = "include", required = false) List<String> includes) {
 
-        return ResponseEntity.ok(categoryService.getCategoryById(id)) ;
+        return ResponseEntity.ok(categoryService.getCategoryById(id, includes)) ;
     }
 
     @PostMapping
@@ -45,26 +42,26 @@ public class CategoryController {
 
     @PutMapping("{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public Category updateCategory(@PathVariable Long id, @RequestBody Category category) {
+    public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(@PathVariable Long id, @RequestBody CategoryRequest categoryRequest) {
 
-        return categoryService.updateCategory(id, category);
+        return ResponseEntity.ok(categoryService.updateCategory(id, categoryRequest));
     }
 
     @DeleteMapping("{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public void deleteCategory(@PathVariable Long id) {
+    public ResponseEntity<Message> deleteCategory(@PathVariable Long id) {
 
-        categoryService.deleteCategory(id);
+        return ResponseEntity.ok(categoryService.deleteCategory(id));
     }
 
     @GetMapping("{id}/brands")
-    public ResponseEntity<ApiResponse<Set<BrandResponse>>> getBrandsByCategoryId(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<List<BrandResponse>>> getBrandsByCategoryId(@PathVariable Long id) {
 
         return ResponseEntity.ok(categoryService.getBrandsByCategoryId(id));
     }
 
     @GetMapping("{id}/attributes")
-    public ResponseEntity<ApiResponse<Set<AttributeResponse>>> getAttributesByCategoryId(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<List<AttributeResponse>>> getAttributesByCategoryId(@PathVariable Long id) {
 
         return ResponseEntity.ok(categoryService.getAttributesByCategoryId(id));
     }

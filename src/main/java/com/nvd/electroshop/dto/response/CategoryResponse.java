@@ -1,19 +1,24 @@
 package com.nvd.electroshop.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.*;
 
 import java.util.List;
+import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CategoryResponse {
 
     private Long id;
     private String name;
 
-//    private List<Long> brandIds;
-//    private List<Long> attributeIds;
+    private List<BrandResponse> brands;
+    private List<ProductResponse> products;
+    private List<AttributeResponse> attributes;
 }

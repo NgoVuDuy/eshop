@@ -1,19 +1,21 @@
 package com.nvd.electroshop.service.impl;
 
 import com.nvd.electroshop.dto.request.CategoryRequest;
-import com.nvd.electroshop.dto.response.ApiResponse;
-import com.nvd.electroshop.dto.response.AttributeResponse;
-import com.nvd.electroshop.dto.response.BrandResponse;
-import com.nvd.electroshop.dto.response.CategoryResponse;
+import com.nvd.electroshop.dto.response.*;
 import com.nvd.electroshop.entity.Attribute;
 import com.nvd.electroshop.entity.Brand;
 import com.nvd.electroshop.entity.Category;
+import com.nvd.electroshop.entity.Product;
+import com.nvd.electroshop.exception.ResourceNotFoundException;
+import com.nvd.electroshop.mapper.AttributeMapper;
+import com.nvd.electroshop.mapper.BrandMapper;
+import com.nvd.electroshop.mapper.CategoryMapper;
 import com.nvd.electroshop.repository.AttributeRepository;
 import com.nvd.electroshop.repository.BrandRepository;
 import com.nvd.electroshop.repository.CategoryRepository;
+import com.nvd.electroshop.repository.ProductRepository;
 import com.nvd.electroshop.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -27,42 +29,29 @@ public class CategoryServiceImpl implements CategoryService {
     private BrandRepository brandRepository;
     @Autowired
     private AttributeRepository attributeRepository;
+    @Autowired
+    private CategoryMapper categoryMapper;
+    @Autowired
+    private BrandMapper brandMapper;
+    @Autowired
+    private AttributeMapper attributeMapper;
+    @Autowired
+    private ProductRepository productRepository;
 
     @Override
-    public ApiResponse<List<CategoryResponse>>  getAllCategories() {
+    public ApiResponse<List<CategoryResponse>>  getAllCategories(List<String> includes) {
 
-        List<Category> category = categoryRepository.findAll();
+        List<Category> categoryList = categoryRepository.findAll();
+        List<CategoryResponse> categoryResponseList = categoryMapper.mapToCategoryResponseList(categoryList, includes);
 
-        List<CategoryResponse> categoryResponseIterable = new ArrayList<>();
-
-        category.forEach(c -> {
-
-            CategoryResponse categoryResponse = new CategoryResponse();
-            categoryResponse.setId(c.getId());
-            categoryResponse.setName(c.getName());
-
-            categoryResponseIterable.add(categoryResponse);
-        });
-
-        return new ApiResponse<>(1, categoryResponseIterable);
+        return new ApiResponse<>(1, categoryResponseList);
     }
 
     @Override
-    public ApiResponse<CategoryResponse> getCategoryById(Long id) {
+    public ApiResponse<CategoryResponse> getCategoryById(Long id, List<String> includes) {
 
-        Optional<Category> categoryOptional = categoryRepository.findById(id);
-
-        if(categoryOptional.isEmpty()) {
-
-            throw new RuntimeException("Không tìm thấy danh mục sản phẩm");
-        }
-
-        Category category = categoryOptional.get();
-
-        CategoryResponse categoryResponse = new CategoryResponse(
-                category.getId(),
-                category.getName()
-        );
+        Category category = getCategory(id);
+        CategoryResponse categoryResponse = categoryMapper.mapToCategoryResponse(category, includes);
 
         return new ApiResponse<>(1, categoryResponse);
     }
@@ -70,111 +59,66 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public ApiResponse<CategoryResponse> createCategory(CategoryRequest categoryRequest) {
 
-        Category category = new Category();
-        category.setName(categoryRequest.getName());
-
-        //
-        if(categoryRequest.getBrandIds() != null) {
-
-            Iterable<Brand> brandIterable = brandRepository.findAllById(categoryRequest.getBrandIds());
-
-            Set<Brand> brandSet = new HashSet<>();
-            brandIterable.forEach(brandSet::add);
-
-            category.setBrands(brandSet);
-        }
-
-        if(categoryRequest.getAttributeIds() != null) {
-
-            Iterable<Attribute> attributeIterable = attributeRepository.findAllById(categoryRequest.getAttributeIds());
-
-            Set<Attribute> attributeSet = new HashSet<>();
-            attributeIterable.forEach(attributeSet::add);
-
-            category.setAttributes(attributeSet);
-        }
+        Category category = categoryMapper.mapToCategory(categoryRequest);
 
         category = categoryRepository.save(category);
-        CategoryResponse categoryResponse = new CategoryResponse(category.getId(), category.getName());
+        CategoryResponse categoryResponse = categoryMapper.mapToCategoryResponse(category);
 
         return new ApiResponse<>(1, categoryResponse);
     }
 
     @Override
-    public Category updateCategory(Long id, Category categoryDetails) {
+    public ApiResponse<CategoryResponse> updateCategory(Long id, CategoryRequest categoryRequest) {
 
-        Optional<Category> categoryOptional = categoryRepository.findById(id);
+        Category category = getCategory(id);
+        category = categoryMapper.mapToCategory(categoryRequest, category);
 
-        if(categoryOptional.isPresent()) {
+        category = categoryRepository.save(category);
+        CategoryResponse categoryResponse = categoryMapper.mapToCategoryResponse(category);
 
-            Category category = categoryOptional.get();
-            category.setName(categoryDetails.getName());
-
-            return categoryRepository.save(category);
-
-        } else {
-            throw new RuntimeException("Cập nhật danh mục sản phẩm thất bại");
-        }
-
+        return new ApiResponse<>(1, categoryResponse);
     }
 
     @Override
-    public void deleteCategory(Long id) {
+    public Message deleteCategory(Long id) {
 
-        Optional<Category> categoryOptional = categoryRepository.findById(id);
+        Category category = getCategory(id);
+        categoryRepository.delete(category);
 
-        if(categoryOptional.isPresent()) {
-
-            categoryRepository.delete(categoryOptional.get());
-        } else {
-            throw new RuntimeException("Xóa danh mục sản phẩm thất bại");
-        }
+        return new Message(1, "Xóa danh mục thành công");
     }
 
     @Override
-    public ApiResponse<Set<BrandResponse>> getBrandsByCategoryId(Long id) {
+    public ApiResponse<List<BrandResponse>> getBrandsByCategoryId(Long id) {
+
+        Category category = getCategory(id);
+
+        List<Brand> brandList = new ArrayList<>(category.getBrands());
+        List<BrandResponse> brandResponseList = brandMapper.mapToBrandResponseList(brandList);
+
+        return new ApiResponse<>(1, brandResponseList);
+    }
+
+    @Override
+    public ApiResponse<List<AttributeResponse>> getAttributesByCategoryId(Long id) {
+
+        Category category = getCategory(id);
+
+        List<Attribute> attributeList = new ArrayList<>(category.getAttributes());
+        List<AttributeResponse> attributeResponseList = attributeMapper.mapToAttributeResponseList(attributeList);
+
+        return new ApiResponse<>(1, attributeResponseList);
+    }
+    // ?
+
+    private Category getCategory(Long id) {
 
         Optional<Category> categoryOptional = categoryRepository.findById(id);
-
         if(categoryOptional.isEmpty()) {
-            throw new RuntimeException("Không tìm thấy danh mục sản phẩm");
+
+            throw new ResourceNotFoundException("Không tìm thấy danh mục sản phẩm");
         }
 
-        Category category = categoryOptional.get();
-        Set<Brand> brands = category.getBrands();
-
-        Set<BrandResponse> brandResponseSet = new HashSet<>();
-
-        for (Brand brand : brands) {
-
-            BrandResponse brandResponse = new BrandResponse(brand.getId(), brand.getName());
-            brandResponseSet.add(brandResponse);
-        }
-
-        return new ApiResponse<>(1, brandResponseSet);
-    }
-
-    @Override
-    public ApiResponse<Set<AttributeResponse>> getAttributesByCategoryId(Long id) {
-
-        Optional<Category> categoryOptional = categoryRepository.findById(id);
-
-        if(categoryOptional.isEmpty()) {
-            throw new RuntimeException("Không tìm thấy danh mục");
-        }
-
-        Category category = categoryOptional.get();
-
-        Set<Attribute> attributes = category.getAttributes();
-
-        Set<AttributeResponse> attributeResponseSet = new HashSet<>();
-
-        for (Attribute attribute : attributes) {
-
-            AttributeResponse attributeResponse = new AttributeResponse(attribute.getId(), attribute.getName(), attribute.getUnit());
-            attributeResponseSet.add(attributeResponse);
-        }
-
-        return new ApiResponse<>(1, attributeResponseSet);
+        return categoryOptional.get();
     }
 }
