@@ -16,4 +16,25 @@ public class MainExceptionHandler {
 
         return new Message(0, e.getMessage());
     }
+
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public Message badRequestException(Exception e, WebRequest w) {
+
+        return new Message(0, e.getMessage());
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    public Message resourceNotFoundException(Exception e, WebRequest w) {
+
+        return new Message(0, e.getMessage());
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(value = HttpStatus.CONFLICT)
+    public Message conflictException(Exception e, WebRequest w) {
+
+        return new Message(0, e.getMessage());
+    }
 }

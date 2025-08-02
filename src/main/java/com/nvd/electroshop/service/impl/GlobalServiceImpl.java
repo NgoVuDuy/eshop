@@ -2,6 +2,7 @@ package com.nvd.electroshop.service.impl;
 
 import com.nvd.electroshop.entity.Product;
 import com.nvd.electroshop.entity.User;
+import com.nvd.electroshop.exception.ResourceNotFoundException;
 import com.nvd.electroshop.repository.ProductRepository;
 import com.nvd.electroshop.repository.UserRepository;
 import com.nvd.electroshop.service.GlobalService;
@@ -10,6 +11,9 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -27,7 +31,7 @@ public class GlobalServiceImpl implements GlobalService {
 
         if(userOptional.isEmpty()) {
 
-            throw new RuntimeException("Không tìm thấy người dùng");
+            throw new ResourceNotFoundException("Không tìm thấy người dùng");
         }
 
         return userOptional.get();
@@ -39,9 +43,19 @@ public class GlobalServiceImpl implements GlobalService {
         Optional<Product> productOptional = productRepository.findById(productId);
 
         if (productOptional.isEmpty()) {
-            throw new RuntimeException("Không tìm thấy sản phẩm");
+            throw new ResourceNotFoundException("Không tìm thấy sản phẩm");
         }
 
         return productOptional.get();
+    }
+
+    @Override
+    public String formatCurrency(double amount) {
+
+        amount = amount * 1000;
+
+        DecimalFormat decimalFormat = new DecimalFormat("#,###");
+
+        return decimalFormat.format(amount);
     }
 }

@@ -7,6 +7,8 @@ import com.nvd.electroshop.dto.response.ReviewResponse;
 import com.nvd.electroshop.entity.Product;
 import com.nvd.electroshop.entity.Review;
 import com.nvd.electroshop.entity.User;
+import com.nvd.electroshop.exception.BadRequestException;
+import com.nvd.electroshop.exception.ResourceNotFoundException;
 import com.nvd.electroshop.mapper.ReviewMapper;
 import com.nvd.electroshop.repository.ProductRepository;
 import com.nvd.electroshop.repository.ReviewRepository;
@@ -20,12 +22,10 @@ import java.util.List;
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
-
     private final ReviewMapper reviewMapper;
     private final GlobalService globalService;
 
     public ReviewServiceImpl(ReviewRepository reviewRepository,
-                             ProductRepository productRepository,
                              ReviewMapper reviewMapper,
                              GlobalService globalService
                              ) {
@@ -116,7 +116,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         if (!reviewRepository.existsByUserAndProduct(user, product)) {
 
-            throw new RuntimeException("Bạn chưa đánh giá sản phẩm này rồi");
+            throw new ResourceNotFoundException("Bạn chưa đánh giá sản phẩm này rồi");
         }
 
         return reviewRepository.findByUserAndProduct(user, product);
@@ -126,7 +126,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         if (reviewRepository.existsByUserAndProduct(user, product)) {
 
-            throw new RuntimeException("Bạn đã đánh giá sản phẩm này rồi");
+            throw new BadRequestException("Bạn đã đánh giá sản phẩm này rồi");
         }
 
         return reviewMapper.mapToReview(user, product, reviewRequest);

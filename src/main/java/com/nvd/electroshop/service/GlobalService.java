@@ -8,4 +8,6 @@ public interface GlobalService {
 
     public User getUserByToken();
     public Product getProductById(Long productId);
+
+    public String formatCurrency(double amount);
 }
