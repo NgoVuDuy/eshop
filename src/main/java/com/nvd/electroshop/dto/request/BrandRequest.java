@@ -17,5 +17,5 @@ public class BrandRequest {
     private Long id;
     private String name;
 
-    private List<Long> categoryIds;
+//    private List<Long> categoryIds;
 }

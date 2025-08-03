@@ -17,9 +17,7 @@ public interface CategoryService {
     public ApiResponse<CategoryResponse> updateCategory(Long id, CategoryRequest categoryRequest);
     public Message deleteCategory(Long id);
 
-    // Lấy các hãng của danh mục
     public ApiResponse<List<BrandResponse>> getBrandsByCategoryId(Long id);
-
-    // Lấy các thuộc tính của danh mục
     public ApiResponse<List<AttributeResponse>> getAttributesByCategoryId(Long id);
+    public ApiResponse<List<ProductResponse>> getProductsByCategoryId(Long id);
 }

@@ -66,4 +66,10 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getAttributesByCategoryId(id));
     }
 
+    @GetMapping("{id}/products")
+    public ResponseEntity<ApiResponse<List<ProductResponse>>> getProductsByCategoryId(@PathVariable Long id) {
+
+        return ResponseEntity.ok(categoryService.getProductsByCategoryId(id));
+    }
+
 }

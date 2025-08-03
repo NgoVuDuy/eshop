@@ -6,10 +6,11 @@ import com.nvd.electroshop.dto.response.BrandResponse;
 import com.nvd.electroshop.dto.response.Message;
 import com.nvd.electroshop.entity.Brand;
 import com.nvd.electroshop.entity.Category;
+import com.nvd.electroshop.exception.ResourceNotFoundException;
+import com.nvd.electroshop.mapper.BrandMapper;
 import com.nvd.electroshop.repository.BrandRepository;
 import com.nvd.electroshop.repository.CategoryRepository;
 import com.nvd.electroshop.service.BrandService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -17,69 +18,43 @@ import java.util.*;
 @Service
 public class BrandServiceImpl implements BrandService {
 
-    @Autowired
-    BrandRepository brandRepository;
-    @Autowired
-    CategoryRepository categoryRepository;
+    private final BrandRepository brandRepository;
+    private final BrandMapper brandMapper;
+
+    public BrandServiceImpl(
+            BrandRepository brandRepository,
+            CategoryRepository categoryRepository,
+            BrandMapper brandMapper
+    ) {
+        this.brandRepository = brandRepository;
+        this.brandMapper = brandMapper;
+    }
 
     @Override
-    public ApiResponse<List<BrandResponse>> getAllBrands() {
+    public ApiResponse<List<BrandResponse>> getAllBrands(List<String> includes) {
 
         List<Brand> brandList = brandRepository.findAll();
-
-        List<BrandResponse> brandResponseList = brandList.stream().map(brand ->
-
-                BrandResponse.builder()
-                .id(brand.getId())
-                .name(brand.getName())
-                .build()).toList();
+        List<BrandResponse> brandResponseList = brandMapper.mapToBrandResponseList(brandList, includes);
 
         return new ApiResponse<>(1, brandResponseList);
     }
 
     @Override
-    public ApiResponse<BrandResponse> getBrandById(Long id) {
+    public ApiResponse<BrandResponse> getBrandById(Long id, List<String> includes) {
 
-        Optional<Brand> brandOptional = brandRepository.findById(id);
-
-        if(brandOptional.isEmpty()) {
-            throw new RuntimeException("Không tìm thấy hãng");
-
-        }
-        Brand brand = brandOptional.get();
-
-        BrandResponse brandResponse = BrandResponse.builder()
-                .id(brand.getId())
-                .name(brand.getName())
-                .build();
+        Brand brand = getBrand(id);
+        BrandResponse brandResponse = brandMapper.mapToBrandResponse(brand, includes);
 
         return new ApiResponse<>(1, brandResponse);
-
     }
 
     @Override
     public ApiResponse<BrandResponse> createBrand(BrandRequest brandRequest) {
 
-        Brand brand = new Brand();
-        brand.setName(brandRequest.getName());
-
+        Brand brand = brandMapper.mapToBrand(brandRequest);
         brand = brandRepository.save(brand);
 
-        if(brandRequest.getCategoryIds() != null) {
-
-            List<Category> categoryList = categoryRepository.findAllById(brandRequest.getCategoryIds());
-
-            for(Category category : categoryList) {
-
-                category.getBrands().add(brand);
-            }
-
-            categoryRepository.saveAll(categoryList);
-        }
-        BrandResponse brandResponse = BrandResponse.builder()
-                .id(brand.getId())
-                .name(brand.getName())
-                .build();
+        BrandResponse brandResponse = brandMapper.mapToBrandResponse(brand);
 
         return new ApiResponse<>(1, brandResponse);
     }
@@ -87,40 +62,32 @@ public class BrandServiceImpl implements BrandService {
     @Override
     public ApiResponse<BrandResponse> updateBrand(Long id, BrandRequest brandRequest) {
 
-        Optional<Brand> brandOptional = brandRepository.findById(id);
-
-        if(brandOptional.isEmpty()) {
-
-            throw new RuntimeException("Cập nhật hãng thất bại");
-
-        }
-        Brand brand = brandOptional.get();
-        brand.setName(brandRequest.getName());
-
+        Brand brand = getBrand(id);
+        brand = brandMapper.mapToBrand(brandRequest, brand);
         brand = brandRepository.save(brand);
 
-        BrandResponse brandResponse = BrandResponse.builder()
-                .id(brand.getId())
-                .name(brand.getName())
-                .build();
+        BrandResponse brandResponse = brandMapper.mapToBrandResponse(brand);
 
         return new ApiResponse<>(1, brandResponse);
-
     }
 
     @Override
     public Message deleteBrand(Long id) {
 
+        Brand brand = getBrand(id);
+        brandRepository.delete(brand);
+
+        return new Message(1, "Xóa hãng thành công");
+    }
+
+    private Brand getBrand(Long id) {
+
         Optional<Brand> brandOptional = brandRepository.findById(id);
 
         if(brandOptional.isEmpty()) {
-
-            throw new RuntimeException("Xóa hãng thất bại");
-
+            throw new ResourceNotFoundException("Không tìm thấy hãng");
         }
 
-        brandRepository.delete(brandOptional.get());
-
-        return new Message(1, "Xóa hãng thành công");
+        return brandOptional.get();
     }
 }

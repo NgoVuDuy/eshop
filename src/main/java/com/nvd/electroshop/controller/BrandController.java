@@ -21,14 +21,14 @@ public class BrandController {
     BrandService brandService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<BrandResponse>>> getAllBrands() {
+    public ResponseEntity<ApiResponse<List<BrandResponse>>> getAllBrands(@RequestParam(value = "include", required = false) List<String> includes) {
 
-        return ResponseEntity.ok( brandService.getAllBrands()) ;
+        return ResponseEntity.ok( brandService.getAllBrands(includes)) ;
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<ApiResponse<BrandResponse>> getBrandById(@PathVariable Long id) {
-        return ResponseEntity.ok(brandService.getBrandById(id)) ;
+    public ResponseEntity<ApiResponse<BrandResponse>> getBrandById(@PathVariable Long id, @RequestParam(value = "include", required = false) List<String> includes) {
+        return ResponseEntity.ok(brandService.getBrandById(id, includes)) ;
     }
 
     @PostMapping
@@ -38,7 +38,7 @@ public class BrandController {
         return ResponseEntity.ok(brandService.createBrand(brandRequest));
     }
 
-    @PutMapping
+    @PutMapping("{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<ApiResponse<BrandResponse>> updateBrand(@PathVariable Long id, @RequestBody BrandRequest brandRequest) {
 

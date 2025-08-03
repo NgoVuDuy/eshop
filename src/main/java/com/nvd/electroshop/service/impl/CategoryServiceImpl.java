@@ -10,10 +10,8 @@ import com.nvd.electroshop.exception.ResourceNotFoundException;
 import com.nvd.electroshop.mapper.AttributeMapper;
 import com.nvd.electroshop.mapper.BrandMapper;
 import com.nvd.electroshop.mapper.CategoryMapper;
-import com.nvd.electroshop.repository.AttributeRepository;
-import com.nvd.electroshop.repository.BrandRepository;
+import com.nvd.electroshop.mapper.ProductMapper;
 import com.nvd.electroshop.repository.CategoryRepository;
-import com.nvd.electroshop.repository.ProductRepository;
 import com.nvd.electroshop.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,17 +24,13 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
     @Autowired
-    private BrandRepository brandRepository;
-    @Autowired
-    private AttributeRepository attributeRepository;
-    @Autowired
     private CategoryMapper categoryMapper;
     @Autowired
     private BrandMapper brandMapper;
     @Autowired
     private AttributeMapper attributeMapper;
     @Autowired
-    private ProductRepository productRepository;
+    private ProductMapper productMapper;
 
     @Override
     public ApiResponse<List<CategoryResponse>>  getAllCategories(List<String> includes) {
@@ -111,6 +105,17 @@ public class CategoryServiceImpl implements CategoryService {
     }
     // ?
 
+
+    @Override
+    public ApiResponse<List<ProductResponse>> getProductsByCategoryId(Long id) {
+
+        Category category = getCategory(id);
+        List<Product> productList = new ArrayList<>(category.getProducts());
+        List<ProductResponse> productResponseList = productMapper.mapToProductResponseList(productList);
+
+        return new ApiResponse<>(1, productResponseList);
+    }
+
     private Category getCategory(Long id) {
 
         Optional<Category> categoryOptional = categoryRepository.findById(id);
@@ -118,7 +123,6 @@ public class CategoryServiceImpl implements CategoryService {
 
             throw new ResourceNotFoundException("Không tìm thấy danh mục sản phẩm");
         }
-
         return categoryOptional.get();
     }
 }

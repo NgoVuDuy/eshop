@@ -11,8 +11,8 @@ import java.util.Optional;
 
 public interface BrandService {
 
-    public ApiResponse<List<BrandResponse>>  getAllBrands();
-    public ApiResponse<BrandResponse> getBrandById(Long id);
+    public ApiResponse<List<BrandResponse>>  getAllBrands(List<String> includes);
+    public ApiResponse<BrandResponse> getBrandById(Long id, List<String> includes);
     public ApiResponse<BrandResponse> createBrand(BrandRequest brandRequest);
     public ApiResponse<BrandResponse> updateBrand(Long id, BrandRequest brandRequest);
     public Message deleteBrand(Long id);

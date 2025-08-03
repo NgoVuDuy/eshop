@@ -19,7 +19,7 @@ import java.util.*;
 @Component
 public class CategoryMapper {
 
-    private final ProductRepository productRepository;
+//    private final ProductRepository productRepository;
     private final BrandRepository brandRepository;
     private final AttributeRepository attributeRepository;
 
@@ -35,7 +35,7 @@ public class CategoryMapper {
             BrandMapper brandMapper,
             AttributeMapper attributeMapper
     ) {
-        this.productRepository = productRepository;
+//        this.productRepository = productRepository;
         this.brandRepository = brandRepository;
         this.attributeRepository = attributeRepository;
 
@@ -44,15 +44,15 @@ public class CategoryMapper {
         this.attributeMapper = attributeMapper;
     }
 
-    // Trường hợp không truyền includes, mặc định là rỗng
+    //response
     public CategoryResponse mapToCategoryResponse(Category category) {
-        return mapToCategoryResponse(category, null);
+        return this.mapToCategoryResponse(category, null);
     }
 
-    public Category mapToCategory(CategoryRequest categoryRequest) {
-        return mapToCategory(categoryRequest, null);
-    }
+    public List<CategoryResponse> mapToCategoryResponseList(List<Category> categoryList) {
 
+        return this.mapToCategoryResponseList(categoryList, null);
+    }
 
     public CategoryResponse mapToCategoryResponse(Category category, List<String> includes) {
 
@@ -87,11 +87,14 @@ public class CategoryMapper {
         return categoryList.stream().map(category -> this.mapToCategoryResponse(category, includes)).toList();
     }
 
+    // request
+    public Category mapToCategory(CategoryRequest categoryRequest) {
+        return mapToCategory(categoryRequest, null);
+    }
+
     public Category mapToCategory(CategoryRequest categoryRequest, Category categoryDetails) {
 
-        Category category;
-
-        category = Objects.requireNonNullElseGet(categoryDetails, Category::new);
+        Category category = Objects.requireNonNullElseGet(categoryDetails, Category::new);
 
         category.setName(categoryRequest.getName());
 
