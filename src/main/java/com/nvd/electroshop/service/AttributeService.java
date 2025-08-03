@@ -6,6 +6,7 @@ import com.nvd.electroshop.dto.response.AttributeResponse;
 import com.nvd.electroshop.dto.response.Message;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AttributeService {
 
@@ -13,5 +14,6 @@ public interface AttributeService {
     public ApiResponse<AttributeResponse> getAttributeById(Long id);
     public ApiResponse<AttributeResponse> createAttribute(AttributeRequest attributeRequest);
     public ApiResponse<AttributeResponse> updateAttribute(Long id, AttributeRequest attributeRequest);
-    public ApiResponse<Message> deleteAttribute(Long id);
+    public ApiResponse<AttributeResponse> partialUpdateAttribute(Long id, Map<String, Object> requests);
+    public Message deleteAttribute(Long id);
 }

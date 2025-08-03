@@ -15,7 +15,7 @@ public class AttributeRequest {
     private String name;
     private String unit;
 
-    private List<Long> categoryIds;
+//    private List<Long> categoryIds;
 //    private List<Long> productIds;
 
 }

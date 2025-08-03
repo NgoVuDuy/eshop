@@ -3,12 +3,15 @@ package com.nvd.electroshop.controller;
 import com.nvd.electroshop.dto.request.AttributeRequest;
 import com.nvd.electroshop.dto.response.ApiResponse;
 import com.nvd.electroshop.dto.response.AttributeResponse;
+import com.nvd.electroshop.dto.response.Message;
+import com.nvd.electroshop.entity.Attribute;
 import com.nvd.electroshop.service.AttributeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/attributes")
@@ -23,9 +26,33 @@ public class AttributeController {
         return ResponseEntity.ok(attributeService.getAllAttributes());
     }
 
+    @GetMapping("{id}")
+    public ResponseEntity<ApiResponse<AttributeResponse>> getAttributeById(@PathVariable Long id) {
+
+        return ResponseEntity.ok(attributeService.getAttributeById(id));
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponse<AttributeResponse>> createAttribute(@RequestBody AttributeRequest attributeRequest) {
 
         return ResponseEntity.ok(attributeService.createAttribute(attributeRequest));
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<ApiResponse<AttributeResponse>> updateAttribute(@RequestBody AttributeRequest attributeRequest, @PathVariable Long id) {
+
+        return ResponseEntity.ok(attributeService.updateAttribute(id, attributeRequest));
+    }
+
+    @PatchMapping("{id}")
+    public ResponseEntity<ApiResponse<AttributeResponse>> partialUpdateAttribute(@RequestBody Map<String, Object> requests, @PathVariable Long id) {
+
+        return ResponseEntity.ok(attributeService.partialUpdateAttribute(id, requests));
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Message> deleteAttribute(@PathVariable Long id) {
+
+        return ResponseEntity.ok(attributeService.deleteAttribute(id));
     }
 }
