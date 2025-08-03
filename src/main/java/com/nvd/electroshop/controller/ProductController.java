@@ -1,8 +1,7 @@
 package com.nvd.electroshop.controller;
 
 import com.nvd.electroshop.dto.request.ProductRequest;
-import com.nvd.electroshop.dto.response.ApiResponse;
-import com.nvd.electroshop.dto.response.ProductResponse;
+import com.nvd.electroshop.dto.response.*;
 import com.nvd.electroshop.entity.Product;
 import com.nvd.electroshop.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,16 +18,16 @@ public class ProductController {
     ProductService productService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ProductResponse>>>  getAllProducts() {
+    public ResponseEntity<ApiResponse<List<ProductResponse>>>  getAllProducts(@RequestParam(value = "include", required = false) List<String> includes) {
 
-        return ResponseEntity.ok(productService.getAllProducts());
+        return ResponseEntity.ok(productService.getAllProducts(includes));
     }
 
-//    @GetMapping("{id}")
-//    public Product getProductById(@PathVariable Long id) {
-//
-//        return productService.getProductById(id);
-//    }
+    @GetMapping("{id}")
+    public ResponseEntity<ApiResponse<ProductResponse>> getProductById(@PathVariable Long id, @RequestParam(value = "include", required = false) List<String> includes) {
+
+        return ResponseEntity.ok(productService.getProductById(id, includes));
+    }
 
     @PostMapping
     public ResponseEntity<ApiResponse<ProductResponse>> createProduct(@RequestBody ProductRequest productRequest) {
@@ -36,15 +35,37 @@ public class ProductController {
         return ResponseEntity.ok(productService.createProduct(productRequest));
     }
 
-//    @PutMapping("{id}")
-//    public Product updateProduct(@PathVariable Long id, @RequestBody Product product) {
-//
-//        return productService.updateProduct(id, product);
-//    }
-//
-//    @DeleteMapping("{id}")
-//    public void deleteProduct(@PathVariable Long id) {
-//
-//        productService.deleteProduct(id);
-//    }
+    @PutMapping("{id}")
+    public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(@PathVariable Long id, @RequestBody ProductRequest productRequest) {
+
+        return ResponseEntity.ok(productService.updateProduct(id, productRequest)) ;
+    }
+
+    @GetMapping("{productId}/reviews")
+    public ResponseEntity<ApiResponse<List<ReviewResponse>>> getReviewsByProductId(@PathVariable Long productId) {
+
+        return ResponseEntity.ok(productService.getReviewsByProductId(productId));
+    }
+
+    @GetMapping("{productId}/brand")
+    public ResponseEntity<ApiResponse<BrandResponse>> getBrandByProductId(@PathVariable Long productId) {
+
+        return ResponseEntity.ok(productService.getBrandByProductId(productId));
+    }
+    @GetMapping("{productId}/categories")
+    public ResponseEntity<ApiResponse<List<CategoryResponse>>> getCategoriesByProductId(@PathVariable Long productId) {
+
+        return ResponseEntity.ok(productService.getCategoriesByProductId(productId));
+    }
+    @GetMapping("{productId}/attributes")
+    public ResponseEntity<ApiResponse<List<AttributeProductResponse>>> getAttributeProductsById(@PathVariable Long productId) {
+
+        return ResponseEntity.ok(productService.getAttributeProductsById(productId));
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Message> deleteProduct(@PathVariable Long id) {
+
+        return ResponseEntity.ok(productService.deleteProduct(id));
+    }
 }

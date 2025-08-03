@@ -3,10 +3,9 @@ package com.nvd.electroshop.service.impl;
 import com.nvd.electroshop.dto.request.AttributeProductRequest;
 import com.nvd.electroshop.dto.request.ProductRequest;
 import com.nvd.electroshop.dto.response.*;
-import com.nvd.electroshop.entity.Attribute;
-import com.nvd.electroshop.entity.AttributeProduct;
-import com.nvd.electroshop.entity.Brand;
-import com.nvd.electroshop.entity.Product;
+import com.nvd.electroshop.entity.*;
+import com.nvd.electroshop.exception.ResourceNotFoundException;
+import com.nvd.electroshop.mapper.*;
 import com.nvd.electroshop.repository.AttributeProductRepository;
 import com.nvd.electroshop.repository.AttributeRepository;
 import com.nvd.electroshop.repository.BrandRepository;
@@ -17,157 +16,146 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    @Autowired
-    ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    BrandRepository brandRepository;
+    private final ProductMapper productMapper;
+    private final ReviewMapper reviewMapper;
+    private final BrandMapper brandMapper;
+    private final CategoryMapper categoryMapper;
+    private final AttributeProductMapper attributeProductMapper;
 
-    @Autowired
-    AttributeRepository attributeRepository;
-
-    @Autowired
-    AttributeProductRepository attributeProductRepository;
+    public ProductServiceImpl(
+            ProductRepository productRepository,
+            ProductMapper productMapper,
+            ReviewMapper reviewMapper,
+            BrandMapper brandMapper,
+            CategoryMapper categoryMapper,
+            AttributeProductMapper attributeProductMapper
+    ) {
+        this.productRepository = productRepository;
+        this.productMapper = productMapper;
+        this.reviewMapper = reviewMapper;
+        this.brandMapper = brandMapper;
+        this.categoryMapper = categoryMapper;
+        this.attributeProductMapper = attributeProductMapper;
+    }
 
     @Override
-    public ApiResponse<List<ProductResponse>> getAllProducts() {
+    public ApiResponse<List<ProductResponse>> getAllProducts(List<String> includes) {
 
         List<Product> products = productRepository.findAll();
-
-        List<ProductResponse> productResponseList = new ArrayList<>();
-
-        products.forEach(product -> {
-
-            Brand brand = product.getBrand();
-            BrandResponse brandResponse = BrandResponse.builder()
-                    .id(brand.getId())
-                    .name(brand.getName())
-                    .build();
-
-            List<AttributeProduct> attributeProductList = product.getAttributeProducts();
-            List<AttributeProductResponse> attributeProductResponses = new ArrayList<>();
-
-            for (AttributeProduct attributeProduct : attributeProductList) {
-
-                AttributeProductResponse attributeProductResponse = AttributeProductResponse.builder()
-                        .name(attributeProduct.getAttribute().getName())
-                        .unit(attributeProduct.getAttribute().getUnit())
-                        .value(attributeProduct.getValue())
-                        .build();
-                attributeProductResponses.add(attributeProductResponse);
-            }
-
-
-            ProductResponse productResponse = ProductResponse.builder()
-                    .name(product.getName())
-                    .stockQuantity(product.getStockQuantity())
-                    .price(product.getPrice())
-                    .brandResponse(brandResponse)
-                    .attributeProductResponses(attributeProductResponses)
-                    .build();
-
-            productResponseList.add(productResponse);
-        });
+        List<ProductResponse> productResponseList = productMapper.mapToProductResponseList(products, includes);
 
         return new ApiResponse<>(1, productResponseList);
     }
 
     @Override
-    public ApiResponse<ProductResponse> createProduct(ProductRequest productRequest) {
+    public ApiResponse<ProductResponse> getProductById(Long id, List<String> includes) {
 
-        // Brand
-        Optional<Brand> brandOptional = brandRepository.findById(productRequest.getBrandId());
-
-        if(brandOptional.isEmpty()) {
-            throw new RuntimeException("Không tìm thấy hãng");
-        }
-
-        Brand brand = brandOptional.get();
-
-        Product product = Product.builder()
-                .name(productRequest.getName())
-                .stockQuantity(productRequest.getStockQuantity())
-                .price(productRequest.getPrice())
-                .brand(brand)
-                .build();
-
-        product = productRepository.save(product);
-
-        List<AttributeProductRequest> attributeProductRequests = productRequest.getAttributeProductRequests();
-        List<AttributeProduct> attributeProductList = new ArrayList<>();
-
-        for (AttributeProductRequest attributeProductRequest : attributeProductRequests) {
-
-            Optional<Attribute> attributeOptional = attributeRepository.findById(attributeProductRequest.getAttributeId());
-
-            if (attributeOptional.isEmpty()) {
-                throw new RuntimeException("Không tìm thấy thông số");
-            }
-
-            Attribute attribute = attributeOptional.get();
-
-            AttributeProduct attributeProduct = AttributeProduct.builder()
-
-                    .product(product)
-                    .attribute(attribute)
-                    .value(attributeProductRequest.getValue())
-                    .build();
-
-            attributeProductList.add(attributeProduct);
-        }
-
-        product.setAttributeProducts(attributeProductList);
-        attributeProductRepository.saveAll(attributeProductList);
-
-//        attributeProductRepository.saveAll(attributeProductList);
-        product = productRepository.save(product);
-
-        BrandResponse brandResponse = BrandResponse.builder()
-                .id(brand.getId())
-                .name(brand.getName())
-                .build();
-
-        List<AttributeProduct> attributeProducts = product.getAttributeProducts();
-        List<AttributeProductResponse> attributeProductResponses = new ArrayList<>();
-
-        for (AttributeProduct attributeProduct : attributeProducts) {
-
-            AttributeProductResponse attributeProductResponse = AttributeProductResponse.builder()
-                    .name(attributeProduct.getAttribute().getName())
-                    .unit(attributeProduct.getAttribute().getUnit())
-                    .value(attributeProduct.getValue())
-                    .build();
-            attributeProductResponses.add(attributeProductResponse);
-        }
-
-        ProductResponse productResponse = ProductResponse.builder()
-                .name(product.getName())
-                .stockQuantity(product.getStockQuantity())
-                .price(product.getPrice())
-                .brandResponse(brandResponse)
-                .attributeProductResponses(attributeProductResponses)
-                .build();
+        Product product = getProduct(id);
+        ProductResponse productResponse = productMapper.mapToProductResponse(product, includes);
 
         return new ApiResponse<>(1, productResponse);
     }
 
     @Override
-    public ApiResponse<ProductResponse> getProductById(Long id) {
-        return null;
+    public ApiResponse<ProductResponse> createProduct(ProductRequest productRequest) {
+
+        Product product = productMapper.mapToProduct(productRequest);
+        product = productRepository.save(product);
+
+        ProductResponse productResponse = productMapper.mapToProductResponse(product);
+
+        return new ApiResponse<>(1, productResponse);
     }
+
+
 
     @Override
     public ApiResponse<ProductResponse> updateProduct(Long id, ProductRequest productRequest) {
+
+        Product product = getProduct(id);
+        product = productMapper.mapToProduct(productRequest, product);
+
+        product = productRepository.save(product);
+
+        ProductResponse productResponse = productMapper.mapToProductResponse(product);
+        return new ApiResponse<>(1, productResponse);
+    }
+
+    @Override
+    public ApiResponse<ProductResponse> partialUpdateProduct(Long id, Map<String, Object> requests) {
+
         return null;
     }
 
     @Override
     public Message deleteProduct(Long id) {
-        return null;
+
+        Product product = getProduct(id);
+        productRepository.delete(product);
+
+        return new Message(1, "Xóa sản phẩm thành công");
     }
+
+    @Override
+    public ApiResponse<List<ReviewResponse>> getReviewsByProductId(Long id) {
+
+        Product product = getProduct(id);
+        List<Review> reviewList = product.getReviews();
+
+        List<ReviewResponse> reviewResponseList = reviewMapper.mapToReviewResponseList(reviewList);
+        return new ApiResponse<>(1, reviewResponseList);
+    }
+
+    @Override
+    public ApiResponse<List<AttributeProductResponse>> getAttributeProductsById(Long id) {
+
+        Product product = getProduct(id);
+        List<AttributeProduct> attributeProductList = product.getAttributeProducts();
+
+        List<AttributeProductResponse> attributeProductResponseList
+                = attributeProductMapper.mapToAttributeProductResponseList(attributeProductList);
+
+        return new ApiResponse<>(1, attributeProductResponseList);
+    }
+
+    @Override
+    public ApiResponse<List<CategoryResponse>> getCategoriesByProductId(Long id) {
+
+        Product product = getProduct(id);
+        List<Category> categoryList = new ArrayList<>(product.getCategories());
+
+        List<CategoryResponse> categoryResponseList = categoryMapper.mapToCategoryResponseList(categoryList);
+        return new ApiResponse<>(1, categoryResponseList);
+    }
+
+    @Override
+    public ApiResponse<BrandResponse> getBrandByProductId(Long id) {
+
+        Product product = getProduct(id);
+        Brand brand = product.getBrand();
+
+        BrandResponse brandResponse = brandMapper.mapToBrandResponse(brand);
+
+        return new ApiResponse<>(1, brandResponse);
+    }
+
+    private Product getProduct(Long id) {
+
+        Optional<Product> productOptional = productRepository.findById(id);
+        if(productOptional.isEmpty()) {
+
+            throw new ResourceNotFoundException("Không tìm thấy sản phẩm");
+        }
+
+        return productOptional.get();
+    }
+
 }

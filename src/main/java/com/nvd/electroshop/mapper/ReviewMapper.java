@@ -12,6 +12,7 @@ import java.util.List;
 @Component
 public class ReviewMapper {
 
+    //response
     public ReviewResponse mapToReviewResponse(Review review) {
 
         return ReviewResponse.builder()
@@ -25,7 +26,7 @@ public class ReviewMapper {
 
         return reviewList.stream().map(this::mapToReviewResponse).toList();
     }
-
+    // request
     public Review mapToReview(User user, Product product, ReviewRequest reviewRequest) {
 
         return Review.builder()

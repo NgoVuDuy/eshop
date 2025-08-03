@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AttributeProductResponse {
 
+    private Long id;
     private String name;
     private String unit;
     private Double value;

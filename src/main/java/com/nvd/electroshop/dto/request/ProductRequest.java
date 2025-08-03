@@ -14,12 +14,11 @@ import java.util.List;
 public class ProductRequest {
 
     private String name;
-    private Long stockQuantity;
     private Double price;
+    private Long stockQuantity;
 
     private Long brandId;
-//    private List<Long> categoryIds;
+    private List<Long> categoryIds;
     private List<AttributeProductRequest> attributeProductRequests;
-//    private List<String> imageUrl;
 
 }

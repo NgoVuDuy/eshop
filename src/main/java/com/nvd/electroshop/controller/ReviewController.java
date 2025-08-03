@@ -31,11 +31,11 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.getUserReviewByProductId(productId));
     }
 
-    @GetMapping("/products/{productId}/reviews")
-    public ResponseEntity<ApiResponse<List<ReviewResponse>>> getReviewsByProductId(@PathVariable Long productId) {
-
-        return ResponseEntity.ok(reviewService.getReviewsByProductId(productId));
-    }
+//    @GetMapping("/products/{productId}/reviews")
+//    public ResponseEntity<ApiResponse<List<ReviewResponse>>> getReviewsByProductId(@PathVariable Long productId) {
+//
+//        return ResponseEntity.ok(reviewService.getReviewsByProductId(productId));
+//    }
 
     @PostMapping("/users/reviews")
     public ResponseEntity<ApiResponse<ReviewResponse>> createUserReview(@RequestBody ReviewRequest reviewRequest) {

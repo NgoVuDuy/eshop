@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AttributeProductRequest {
 
+//    private Long productId;
     private Long attributeId;
     private Double value;
 }
