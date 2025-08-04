@@ -1,5 +1,6 @@
 package com.nvd.electroshop.service.impl;
 
+import com.nvd.electroshop.entity.Cart;
 import com.nvd.electroshop.entity.Product;
 import com.nvd.electroshop.entity.User;
 import com.nvd.electroshop.exception.ResourceNotFoundException;

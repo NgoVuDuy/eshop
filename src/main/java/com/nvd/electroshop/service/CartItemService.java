@@ -9,8 +9,10 @@ import java.util.List;
 
 public interface CartItemService {
 
-    ApiResponse<List<CartItemResponse>> getCartItemsForUser();
-    ApiResponse<CartItemResponse> createCartItemForUser(CartItemRequest cartItemRequest);
-    ApiResponse<CartItemResponse> updateCartItemForUser();
-    ApiResponse<Message> deleteCartItemsForUser();
+    ApiResponse<List<CartItemResponse>> getAllUserCartItems(List<String> includes);
+    ApiResponse<CartItemResponse> getUserCartItemById(Long id, List<String> includes);
+    ApiResponse<CartItemResponse> createUserCartItem(CartItemRequest cartItemRequest);
+    ApiResponse<CartItemResponse> updateUserCartItem(Long id, CartItemRequest cartItemRequest);
+    ApiResponse<CartItemResponse> partialUserCartItem(Long id, CartItemRequest cartItemRequest);
+    Message deleteUserCartItem(Long id);
 }

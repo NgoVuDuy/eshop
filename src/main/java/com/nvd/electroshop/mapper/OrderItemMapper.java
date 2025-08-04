@@ -23,6 +23,7 @@ public class OrderItemMapper {
     @Autowired
     ProductMapper productMapper;
 
+    // reponse
     public OrderItemResponse mapToOrderItemResponse(OrderItem orderItem) {
 
         Product product = orderItem.getProduct();
@@ -41,6 +42,7 @@ public class OrderItemMapper {
         return orderItemList.stream().map(this::mapToOrderItemResponse).toList();
     }
 
+    // request
     public OrderItem mapToOrderItem(Order order, OrderItemRequest orderItemRequest) {
 
         Product product = globalService.getProductById(orderItemRequest.getProductId());

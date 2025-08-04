@@ -13,27 +13,27 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/user/wishlists")
+@RequestMapping("/users/wishlists")
 public class WishlistController {
 
     @Autowired
     private WishlistService wishlistService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<WishlistResponse>>> getWishlistsByUsername() {
+    public ResponseEntity<ApiResponse<List<WishlistResponse>>> getAllUserWishlists(@RequestParam(value = "include", required = false) List<String> includes) {
 
-        return ResponseEntity.ok(wishlistService.getWishlistsByUsername());
+        return ResponseEntity.ok(wishlistService.getAllUserWishlists(includes));
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<WishlistResponse>> createWishlist(@RequestBody WishlistRequest wishlistRequest) {
+    public ResponseEntity<ApiResponse<WishlistResponse>> createUserWishlist(@RequestBody WishlistRequest wishlistRequest) {
 
-        return ResponseEntity.ok(wishlistService.createWishlist(wishlistRequest));
+        return ResponseEntity.ok(wishlistService.createUserWishlist(wishlistRequest));
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Message> deleteWishlist(@PathVariable Long id) {
+    public ResponseEntity<Message> deleteUserWishlist(@PathVariable Long id) {
 
-        return ResponseEntity.ok(wishlistService.deleteWishlist(id));
+        return ResponseEntity.ok(wishlistService.deleteUserWishlist(id));
     }
 }

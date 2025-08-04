@@ -1,9 +1,10 @@
 package com.nvd.electroshop.service.impl;
 
-import com.nvd.electroshop.dto.response.ApiResponse;
 import com.nvd.electroshop.dto.response.Message;
 import com.nvd.electroshop.entity.Cart;
 import com.nvd.electroshop.entity.User;
+import com.nvd.electroshop.exception.ConflictException;
+import com.nvd.electroshop.exception.ResourceNotFoundException;
 import com.nvd.electroshop.repository.CartRepository;
 import com.nvd.electroshop.repository.UserRepository;
 import com.nvd.electroshop.service.CartService;
@@ -11,7 +12,6 @@ import com.nvd.electroshop.service.GlobalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -32,7 +32,7 @@ public class CartServiceImpl implements CartService {
 
         if(cartRepository.existsByUser_Id(user.getId())) {
 
-            throw new RuntimeException("Giỏ hàng đã tồn tại");
+            throw new ConflictException("Giỏ hàng đã tồn tại");
         }
 
         Cart cart = new Cart();
@@ -50,12 +50,10 @@ public class CartServiceImpl implements CartService {
 
         if(!cartRepository.existsByUser_Id(user.getId())) {
 
-            throw new RuntimeException("Không tìm thấy giỏ hàng");
+            throw new ResourceNotFoundException("Không tìm thấy giỏ hàng");
         }
 
         Cart cart = cartRepository.findByUser_Id(user.getId());
-
-        System.out.println(cart.getUser().getUsername());
 
         user.setCart(null);
         userRepository.save(user);

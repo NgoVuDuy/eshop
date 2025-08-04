@@ -8,6 +8,8 @@ import com.nvd.electroshop.entity.Cart;
 import com.nvd.electroshop.entity.CartItem;
 import com.nvd.electroshop.entity.Product;
 import com.nvd.electroshop.entity.User;
+import com.nvd.electroshop.exception.ResourceNotFoundException;
+import com.nvd.electroshop.mapper.CartItemMapper;
 import com.nvd.electroshop.repository.CartItemRepository;
 import com.nvd.electroshop.repository.CartRepository;
 import com.nvd.electroshop.repository.ProductRepository;
@@ -19,107 +21,99 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 @Service
 public class CartItemServiceImpl implements CartItemService {
 
+    private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
+    private final GlobalService globalService;
 
-    @Autowired
-    private CartItemRepository cartItemRepository;
+    private final CartItemMapper cartItemMapper;
 
-    @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
-    private CartRepository cartRepository;
-
-    @Autowired
-    private GlobalService globalService;
+    public CartItemServiceImpl(CartRepository cartRepository, CartItemRepository cartItemRepository, GlobalService globalService, CartItemMapper cartItemMapper) {
+        this.cartRepository = cartRepository;
+        this.cartItemRepository = cartItemRepository;
+        this.globalService = globalService;
+        this.cartItemMapper = cartItemMapper;
+    }
 
     @Override
-    public ApiResponse<List<CartItemResponse>> getCartItemsForUser() {
+    public ApiResponse<List<CartItemResponse>> getAllUserCartItems(List<String> includes) {
 
         User user = globalService.getUserByToken();
-
-        if (!cartRepository.existsByUser_Id(user.getId())) {
-            throw new RuntimeException("Bạn chưa có giỏ hàng");
-        }
-
-        Cart cart = cartRepository.findByUser_Id(user.getId());
+        Cart cart = user.getCart();
 
         List<CartItem> cartItemList = cart.getCartItems();
-
-        List<CartItemResponse> cartItemResponseList = new ArrayList<>();
-
-        for (CartItem cartItem : cartItemList) {
-
-            Optional<Product> productOptional = productRepository.findById(cartItem.getProduct().getId());
-
-            if (productOptional.isEmpty()) {
-                throw new RuntimeException("Không tìm thấy sản phẩm");
-            }
-
-            Product product = productOptional.get();
-
-            CartItemResponse cartItemResponse = CartItemResponse.builder()
-                    .name(product.getName())
-                    .price(product.getPrice())
-                    .stockQuantity(product.getStockQuantity())
-                    .quantity(cartItem.getQuantity())
-                    .build();
-
-            cartItemResponseList.add(cartItemResponse);
-        }
-
+        List<CartItemResponse> cartItemResponseList = cartItemMapper.mapToCartItemResponseList(cartItemList, includes);
 
         return new ApiResponse<>(1, cartItemResponseList);
     }
 
     @Override
-    public ApiResponse<CartItemResponse> createCartItemForUser(CartItemRequest cartItemRequest) {
+    public ApiResponse<CartItemResponse> getUserCartItemById(Long id, List<String> includes) {
 
-        User user = globalService.getUserByToken();
-
-        if (!cartRepository.existsByUser_Id(user.getId())) {
-            throw new RuntimeException("Bạn chưa có giỏ hàng");
-        }
-
-        Cart cart = cartRepository.findByUser_Id(user.getId());
-
-        Optional<Product> productOptional = productRepository.findById(cartItemRequest.getProductId());
-
-        if (productOptional.isEmpty()) {
-            throw new RuntimeException("Không tìm thấy sản phẩm");
-        }
-
-        Product product = productOptional.get();
-
-        CartItem cartItem = CartItem.builder()
-                .cart(cart)
-                .product(product)
-                .quantity(cartItemRequest.getQuantity())
-                .build();
-
-        cartItemRepository.save(cartItem);
-
-        CartItemResponse cartItemResponse = CartItemResponse.builder()
-                .name(product.getName())
-                .price(product.getPrice())
-                .stockQuantity(product.getStockQuantity())
-                .quantity(cartItem.getQuantity())
-                .build();
+        CartItem cartItem = getCartItem(id);
+        CartItemResponse cartItemResponse = cartItemMapper.mapToCartItemResponse(cartItem, includes);
 
         return new ApiResponse<>(1, cartItemResponse);
     }
 
     @Override
-    public ApiResponse<CartItemResponse> updateCartItemForUser() {
+    public ApiResponse<CartItemResponse> createUserCartItem(CartItemRequest cartItemRequest) {
 
-        return null;
+        User user = globalService.getUserByToken(); // Lấy người dùng
+        Cart cart = user.getCart(); // Lấy giỏ hàng
+
+        CartItem cartItem = cartItemMapper.mapToCartItem(cartItemRequest); // Mapper
+        cartItem.setCart(cart); // set giỏ hàng cho item
+
+        cartItem = cartItemRepository.save(cartItem); // Lưu item
+        CartItemResponse cartItemResponse = cartItemMapper.mapToCartItemResponse(cartItem); // Mapper
+
+        return new ApiResponse<>(1, cartItemResponse);
     }
 
     @Override
-    public ApiResponse<Message> deleteCartItemsForUser() {
-        return null;
+    public ApiResponse<CartItemResponse> updateUserCartItem(Long id, CartItemRequest cartItemRequest) {
+
+        CartItem cartItem = getCartItem(id);
+        cartItem = cartItemMapper.mapToCartItem(cartItemRequest, cartItem);
+
+        cartItem = cartItemRepository.save(cartItem);
+        CartItemResponse cartItemResponse = cartItemMapper.mapToCartItemResponse(cartItem);
+
+        return new ApiResponse<>(1, cartItemResponse);
+    }
+
+    @Override
+    public ApiResponse<CartItemResponse> partialUserCartItem(Long id, CartItemRequest cartItemRequest) {
+
+        CartItem cartItem = getCartItem(id);
+
+        cartItem = cartItemMapper.mapToCartItemRequireNonNull(cartItemRequest, cartItem);
+        cartItem = cartItemRepository.save(cartItem);
+        CartItemResponse cartItemResponse = cartItemMapper.mapToCartItemResponse(cartItem);
+
+        return new ApiResponse<>(1, cartItemResponse);
+    }
+
+    @Override
+    public Message deleteUserCartItem(Long id) {
+
+        cartItemRepository.deleteById(id);
+        return new Message(1, "Xóa chi tiết giỏ hàng thành công");
+    }
+
+    private CartItem getCartItem(Long id) {
+
+        Optional<CartItem> cartItemOptional = cartItemRepository.findById(id);
+
+        if(cartItemOptional.isEmpty()) {
+            throw new ResourceNotFoundException("Không tìm thấy chi tiết giỏ hàng");
+        }
+
+        return cartItemOptional.get();
     }
 }

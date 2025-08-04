@@ -32,7 +32,7 @@ public class User {
     private Role role;
 
     // Một người dùng có một giỏ hàng
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private Cart cart;
 

@@ -7,14 +7,14 @@ import com.nvd.electroshop.dto.response.WishlistResponse;
 import com.nvd.electroshop.entity.Product;
 import com.nvd.electroshop.entity.User;
 import com.nvd.electroshop.entity.Wishlist;
+import com.nvd.electroshop.exception.ConflictException;
+import com.nvd.electroshop.exception.ResourceNotFoundException;
+import com.nvd.electroshop.mapper.WishListMapper;
 import com.nvd.electroshop.repository.ProductRepository;
-import com.nvd.electroshop.repository.UserRepository;
 import com.nvd.electroshop.repository.WishlistRepository;
 import com.nvd.electroshop.service.GlobalService;
 import com.nvd.electroshop.service.WishlistService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,76 +32,72 @@ public class WishlistServiceImpl implements WishlistService {
     @Autowired
     private WishlistRepository wishlistRepository;
 
+    @Autowired
+    private WishListMapper wishListMapper;
+
     @Override
-    public ApiResponse<List<WishlistResponse>> getWishlistsByUsername() {
+    public ApiResponse<List<WishlistResponse>> getAllUserWishlists(List<String> includes) {
 
         User user = globalService.getUserByToken();
 
-        List<Wishlist> userWishlists = user.getWishlists();
-
-        List<WishlistResponse> wishlistResponses = userWishlists.stream().map
-                (userWishlist ->
-                        WishlistResponse.builder()
-                            .id(userWishlist.getProduct().getId())
-                            .price(userWishlist.getProduct().getPrice())
-                            .name(userWishlist.getProduct().getName())
-                            .stockQuantity(userWishlist.getProduct().getStockQuantity())
-                            .build()
-                ).toList();
+        List<Wishlist> wishlists = user.getWishlists();
+        List<WishlistResponse> wishlistResponses = wishListMapper.mapToWishlistResponseList(wishlists, includes);
 
         return new ApiResponse<>(1, wishlistResponses);
     }
 
     @Override
-    public ApiResponse<WishlistResponse> createWishlist(WishlistRequest wishlistRequest) {
+    public ApiResponse<WishlistResponse> createUserWishlist(WishlistRequest wishlistRequest) {
 
-        Optional<Product> productOptional = productRepository.findById(wishlistRequest.getProductId());
-
-        if(productOptional.isEmpty()) {
-
-            throw new RuntimeException("Không tìm thấy sản phẩm");
-        }
-        Product product = productOptional.get();
+        Wishlist wishlist = wishListMapper.mapToWishlist(wishlistRequest);
         User user = globalService.getUserByToken();
 
+        boolean existsUserWishlist = isExistsUserWishlist(user, wishlist);
 
-        boolean existsWishlist = wishlistRepository.existsByUserAndProduct(user, product);
-
-        if(existsWishlist) {
-            throw new RuntimeException("Đã tồn tại sản phẩm yêu thích");
+        if(existsUserWishlist) {
+            throw new ConflictException("Đã tồn tại sản phẩm yêu thích");
         }
 
-        Wishlist wishlist = Wishlist.builder()
-                .user(user)
-                .product(product)
-                .build();
+        wishlist.setUser(user);
+        wishlist = wishlistRepository.save(wishlist);
 
-        Wishlist savedWishlist = wishlistRepository.save(wishlist);
-
-        WishlistResponse wishlistResponse =  WishlistResponse.builder()
-                .id(savedWishlist.getProduct().getId())
-                .price(savedWishlist.getProduct().getPrice())
-                .name(savedWishlist.getProduct().getName())
-                .stockQuantity(savedWishlist.getProduct().getStockQuantity())
-                .build();
+        WishlistResponse wishlistResponse =  wishListMapper.mapToWishlistResponse(wishlist);
 
         return new ApiResponse<>(1, wishlistResponse);
     }
 
     @Override
-    public Message deleteWishlist(Long id) {
+    public Message deleteUserWishlist(Long id) {
 
-        Optional<Wishlist> wishlistOptional = wishlistRepository.findById(id);
+        Wishlist wishlist = getWishlist(id);
+        User user = globalService.getUserByToken();
 
-        if(wishlistOptional.isEmpty()) {
+        boolean existsUserWishlist = isExistsUserWishlist(user, wishlist);
+        if (!existsUserWishlist) {
 
-            throw new RuntimeException("Không tìm thấy mục yêu thích");
+            throw new ResourceNotFoundException("Không tồn tại danh mục yêu thích");
         }
-
-        Wishlist wishlist = wishlistOptional.get();
 
         wishlistRepository.delete(wishlist);
 
         return new Message(1, "Xóa mục yêu thích thành công") ;
     }
+
+    public Wishlist getWishlist(Long id) {
+
+        Optional<Wishlist> wishlistOptional = wishlistRepository.findById(id);
+
+        if(wishlistOptional.isEmpty()) {
+
+            throw new ResourceNotFoundException("Không tìm thấy mục yêu thích");
+        }
+
+        return wishlistOptional.get();
+    }
+
+    public boolean isExistsUserWishlist(User user, Wishlist wishlist) {
+
+        return wishlistRepository.existsByUserAndProduct(user, wishlist.getProduct());
+    }
+
 }
