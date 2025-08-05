@@ -37,4 +37,11 @@ public class MainExceptionHandler {
 
         return new Message(0, e.getMessage());
     }
+
+    @ExceptionHandler(IOException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public Message ioException(Exception e, WebRequest w) {
+
+        return new Message(0, e.getMessage());
+    }
 }

@@ -128,7 +128,6 @@ public class ReviewServiceImpl implements ReviewService {
 
             throw new BadRequestException("Bạn đã đánh giá sản phẩm này rồi");
         }
-
         return reviewMapper.mapToReview(user, product, reviewRequest);
     }
 }

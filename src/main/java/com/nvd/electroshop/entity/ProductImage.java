@@ -2,6 +2,7 @@ package com.nvd.electroshop.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,13 +11,14 @@ import lombok.NoArgsConstructor;
 @Table(name = "product_images")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ProductImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    private String public_id;
+    private String publicId;
     private String url;
 
     // Một hay nhiều ảnh thuộc về một sản phẩm
