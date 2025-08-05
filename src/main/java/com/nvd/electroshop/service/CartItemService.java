@@ -14,5 +14,7 @@ public interface CartItemService {
     ApiResponse<CartItemResponse> createUserCartItem(CartItemRequest cartItemRequest);
     ApiResponse<CartItemResponse> updateUserCartItem(Long id, CartItemRequest cartItemRequest);
     ApiResponse<CartItemResponse> partialUserCartItem(Long id, CartItemRequest cartItemRequest);
+
+    Message deleteAllUserCartItem();
     Message deleteUserCartItem(Long id);
 }

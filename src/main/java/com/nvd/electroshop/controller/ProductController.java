@@ -2,7 +2,6 @@ package com.nvd.electroshop.controller;
 
 import com.nvd.electroshop.dto.request.ProductRequest;
 import com.nvd.electroshop.dto.response.*;
-import com.nvd.electroshop.entity.Product;
 import com.nvd.electroshop.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

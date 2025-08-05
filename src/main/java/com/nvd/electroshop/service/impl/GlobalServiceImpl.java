@@ -13,8 +13,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -57,6 +55,6 @@ public class GlobalServiceImpl implements GlobalService {
 
         DecimalFormat decimalFormat = new DecimalFormat("#,###");
 
-        return decimalFormat.format(amount);
+        return decimalFormat.format(amount) + "đ";
     }
 }

@@ -2,17 +2,12 @@ package com.nvd.electroshop.mapper;
 
 import com.nvd.electroshop.dto.request.AttributeProductRequest;
 import com.nvd.electroshop.dto.request.ProductRequest;
-import com.nvd.electroshop.dto.response.AttributeProductResponse;
-import com.nvd.electroshop.dto.response.BrandResponse;
-import com.nvd.electroshop.dto.response.CategoryResponse;
-import com.nvd.electroshop.dto.response.ProductResponse;
-import com.nvd.electroshop.entity.AttributeProduct;
-import com.nvd.electroshop.entity.Brand;
-import com.nvd.electroshop.entity.Category;
-import com.nvd.electroshop.entity.Product;
+import com.nvd.electroshop.dto.response.*;
+import com.nvd.electroshop.entity.*;
 import com.nvd.electroshop.exception.ResourceNotFoundException;
 import com.nvd.electroshop.repository.BrandRepository;
 import com.nvd.electroshop.repository.CategoryRepository;
+import com.nvd.electroshop.service.GlobalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -25,11 +20,14 @@ public class ProductMapper {
     BrandMapper brandMapper;
     CategoryMapper categoryMapper;
     AttributeProductMapper attributeProductMapper;
+    ProductImageMapper productImageMapper;
 
     @Autowired
     BrandRepository brandRepository;
     @Autowired
     CategoryRepository categoryRepository;
+    @Autowired
+    GlobalService globalService;
 
     @Lazy
     @Autowired
@@ -49,6 +47,12 @@ public class ProductMapper {
         this.attributeProductMapper = attributeProductMapper;
     }
 
+    @Lazy
+    @Autowired
+    public void setProductImageMapper(ProductImageMapper productImageMapper) {
+        this.productImageMapper = productImageMapper;
+    }
+
     // response
     public ProductResponse mapToProductResponse(Product product) {
         return this.mapToProductResponse(product, null);
@@ -62,12 +66,13 @@ public class ProductMapper {
 
         ProductResponse productResponse = ProductResponse.builder()
                 .id(product.getId())
-                .price(product.getPrice())
+                .price(globalService.formatCurrency(product.getPrice()))
                 .name(product.getName())
                 .stockQuantity(product.getStockQuantity())
                 .build();
 
         if (includes != null) {
+
             if (includes.contains("brand")) {
 
                 BrandResponse brandResponse = brandMapper.mapToBrandResponse(product.getBrand());
@@ -88,6 +93,14 @@ public class ProductMapper {
                 List<AttributeProductResponse> attributeProductResponseList = attributeProductMapper.mapToAttributeProductResponseList(attributeProductList);
 
                 productResponse.setAttributeProducts(attributeProductResponseList);
+            }
+
+            if(includes.contains("images")) {
+
+                List<ProductImage> productImageList = product.getProductImages();
+                List<ProductImageResponse> productImageResponseList = productImageMapper.mapToProductImageResponseList(productImageList);
+
+                productResponse.setImages(productImageResponseList);
             }
         }
 
@@ -138,5 +151,4 @@ public class ProductMapper {
 
         return product;
     }
-
 }

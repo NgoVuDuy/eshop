@@ -51,7 +51,7 @@ public class CartItemMapper {
                 .id(cartItem.getId())
                 .product(productResponse)
                 .quantity(cartItem.getQuantity())
-                .price(price)
+                .price(globalService.formatCurrency(price))
                 .build();
     }
 
@@ -77,8 +77,16 @@ public class CartItemMapper {
 
         Product product = globalService.getProductById(cartItemRequest.getProductId());
 
+        if(cartItem.getQuantity() != null) {
+
+            cartItem.setQuantity(cartItemRequest.getQuantity() + cartItem.getQuantity());
+
+        } else {
+
+            cartItem.setQuantity(cartItemRequest.getQuantity());
+        }
+
         cartItem.setProduct(product);
-        cartItem.setQuantity(cartItemRequest.getQuantity());
 
         return cartItem;
     }

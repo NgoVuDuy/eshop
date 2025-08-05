@@ -17,6 +17,7 @@ import com.nvd.electroshop.service.CartItemService;
 import com.nvd.electroshop.service.GlobalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +44,11 @@ public class CartItemServiceImpl implements CartItemService {
     public ApiResponse<List<CartItemResponse>> getAllUserCartItems(List<String> includes) {
 
         User user = globalService.getUserByToken();
+
+        if(!cartRepository.existsByUser_Id(user.getId())) {
+            throw new ResourceNotFoundException("Bạn chưa có giỏ hàng");
+        }
+
         Cart cart = user.getCart();
 
         List<CartItem> cartItemList = cart.getCartItems();
@@ -65,14 +71,32 @@ public class CartItemServiceImpl implements CartItemService {
 
         User user = globalService.getUserByToken(); // Lấy người dùng
         Cart cart = user.getCart(); // Lấy giỏ hàng
+        Product product = globalService.getProductById(cartItemRequest.getProductId());// Lấy sản phẩm cần thêm
 
-        CartItem cartItem = cartItemMapper.mapToCartItem(cartItemRequest); // Mapper
+        Optional<CartItem> cartItemOptional = cartItemRepository.findByCartAndProduct(cart, product);
+
+        CartItem cartItem;
+        // Kiểm tra sản phẩm này có tồn tại trong giỏ hàng hay chưa
+        if(cartItemOptional.isEmpty()) { // Không - tạo mới
+
+            cartItem = cartItemMapper.mapToCartItem(cartItemRequest); // Mapper
+
+
+        } else {
+
+            cartItem = cartItemOptional.get(); //Tồn tại - Lấy sản phẩm
+            cartItem = cartItemMapper.mapToCartItem(cartItemRequest, cartItem); // Cập nhật số lượng
+        }
+
         cartItem.setCart(cart); // set giỏ hàng cho item
 
         cartItem = cartItemRepository.save(cartItem); // Lưu item
         CartItemResponse cartItemResponse = cartItemMapper.mapToCartItemResponse(cartItem); // Mapper
 
         return new ApiResponse<>(1, cartItemResponse);
+
+        // return
+
     }
 
     @Override
@@ -106,9 +130,27 @@ public class CartItemServiceImpl implements CartItemService {
         return new Message(1, "Xóa chi tiết giỏ hàng thành công");
     }
 
+    @Override
+    @Transactional
+    public Message deleteAllUserCartItem() {
+
+        User user = globalService.getUserByToken();
+        Cart cart = user.getCart();
+
+        cart.getCartItems().clear();
+//        cartRepository.save(cart);
+//        cartItemRepository.deleteAll(cartItemList);
+
+        return new Message(1, "Xóa chi tiết giỏ hàng thành công");
+    }
+
     private CartItem getCartItem(Long id) {
 
-        Optional<CartItem> cartItemOptional = cartItemRepository.findById(id);
+        // Kiểm tra cartitem có phải thuộc người dùng hiện tại không
+        User user = globalService.getUserByToken();
+        Cart cart = user.getCart();
+
+        Optional<CartItem> cartItemOptional = cartItemRepository.findByIdAndCart(id, cart);
 
         if(cartItemOptional.isEmpty()) {
             throw new ResourceNotFoundException("Không tìm thấy chi tiết giỏ hàng");

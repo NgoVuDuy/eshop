@@ -13,5 +13,5 @@ public class CartItemResponse {
     private Long id;
     private ProductResponse product;
     private int quantity;
-    private Double price;
+    private String price;
 }

@@ -14,8 +14,10 @@ import com.nvd.electroshop.mapper.ProductImageMapper;
 import com.nvd.electroshop.repository.ProductImageRepository;
 import com.nvd.electroshop.service.GlobalService;
 import com.nvd.electroshop.service.ProductImageService;
+//import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -81,25 +83,61 @@ public class ProductImageServiceImpl implements ProductImageService {
     }
 
     @Override
+    @Transactional
     public Message deleteProductImage(DeleteProductImageRequest deleteProductImageRequest) {
 
-        try {
+        List<String> publicIds = deleteProductImageRequest.getPublicIds();
 
-            Optional<ProductImage> productImageOptional = productImageRepository.findByPublicId(deleteProductImageRequest.getPublicId());
-            if (productImageOptional.isEmpty()) {
+        for (String publicId : publicIds) {
+            try {
+                // XÓA DB trước
+                productImageRepository.deleteByPublicId(publicId);
 
-                throw new ResourceNotFoundException("Không tìm thấy ảnh sản phẩm");
+                // XÓA CLOUDINARY sau
+                cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+
+            } catch (IOException e) {
+                throw new RuntimeException("Lỗi nhập xuất");
             }
-
-            Map result = cloudinary.uploader().destroy(deleteProductImageRequest.getPublicId(), ObjectUtils.emptyMap());
-
-            ProductImage productImage = productImageOptional.get();
-            productImageRepository.delete(productImage);
-
-            return new Message(1, result.get("result").toString());
-
-        } catch (IOException e) {
-            throw new RuntimeException("Lỗi nhập xuất");
         }
+
+        return new Message(1, "Xóa ảnh sản phẩm thành công");
     }
+
+    @Override
+    @Transactional
+    public Message deleteAllProductImages(Long productId) {
+
+        Product product = globalService.getProductById(productId);
+
+        List<ProductImage> productImageList = product.getProductImages();
+        List<String> publicIds = productImageList.stream().map(ProductImage::getPublicId).toList();
+
+        int n = productImageRepository.deleteByPublicIdIn(publicIds);
+        productImageRepository.flush();
+
+        for (String publicId : publicIds) {
+            try {
+
+                Map result = cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+
+                if(!"ok".equals(result.get("result").toString())) {
+
+                    throw new RuntimeException("Không xóa được ảnh trên cloudinary");
+                }
+
+            } catch (IOException e) {
+                throw new RuntimeException("Lỗi nhập xuất");
+            }
+        }
+
+        if(n > 0) {
+            return new Message(1, "Xóa ảnh sản phẩm thành công");
+
+        }
+        return new Message(1, "Xóa ảnh sản phẩm thất bại");
+
+    }
+
+
 }

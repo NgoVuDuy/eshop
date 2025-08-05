@@ -18,11 +18,12 @@ public class ProductResponse {
 
     private Long id;
     private String name;
-    private Double price;
+    private String price;
     private Long stockQuantity;
 
     private BrandResponse brand;
     private List<AttributeProductResponse> attributeProducts;
     private List<CategoryResponse> categories;
     private List<ReviewResponse> reviews;
+    private List<ProductImageResponse> images;
 }

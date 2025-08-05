@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users/cart-items")
+@RequestMapping("/users/cart/items")
 public class CartItemController {
 
     @Autowired
@@ -52,5 +52,11 @@ public class CartItemController {
     public ResponseEntity<Message> deleteUserCartItem (@RequestBody CartItemRequest cartItemRequest, @PathVariable Long id) {
 
         return ResponseEntity.ok(cartItemService.deleteUserCartItem(id));
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Message> deleteAllUserCartItem() {
+
+        return ResponseEntity.ok(cartItemService.deleteAllUserCartItem());
     }
 }

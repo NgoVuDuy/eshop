@@ -14,4 +14,5 @@ public interface ProductImageService {
 
     public ApiResponse<List<ProductImageResponse>> uploadProductImage(ProductImageRequest productImageRequest);
     public Message deleteProductImage(DeleteProductImageRequest deleteProductImageRequest);
+    public Message deleteAllProductImages(Long productId);
 }
