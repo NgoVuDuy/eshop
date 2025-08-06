@@ -14,16 +14,13 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserReponse {
+public class UserResponse {
 
     private Long id;
 
     private String username;
-
     private String phone;
     private String address;
     private LocalDate birthDate;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
 }

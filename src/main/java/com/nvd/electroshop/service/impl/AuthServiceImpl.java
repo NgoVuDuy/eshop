@@ -11,6 +11,7 @@ import com.nvd.electroshop.dto.response.ApiResponse;
 import com.nvd.electroshop.dto.response.AuthResponse;
 import com.nvd.electroshop.dto.response.Message;
 import com.nvd.electroshop.entity.User;
+import com.nvd.electroshop.exception.BadRequestException;
 import com.nvd.electroshop.repository.AuthRepository;
 import com.nvd.electroshop.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,15 +65,18 @@ public class AuthServiceImpl implements AuthService {
 
         Optional<User> userOptional = authRepository.findByUsername(authRequest.getUsername());
 
-        if(userOptional.isEmpty()) {
-            throw new RuntimeException("Tên tài khoản hoặc mật khẩu không đúng");
+        if(userOptional.isEmpty()) { // kiểm tra tên tài khoản
+            throw new BadRequestException("Tên tài khoản hoặc mật khẩu không đúng");
         }
 
         User user = userOptional.get();
+        if (user.isDelete()) { // Kiểm tra trạng thái
+            throw new BadRequestException("Tên tài khoản hoặc mật khẩu không đúng");
+        }
 
-        if(!passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
+        if(!passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) { // Kiểm tra mật khẩu
 
-            throw new RuntimeException("Tên tài khoản hoặc mật khẩu không đúng");
+            throw new BadRequestException("Tên tài khoản hoặc mật khẩu không đúng");
         }
 
         String token = generateToken(user);
@@ -116,20 +120,6 @@ public class AuthServiceImpl implements AuthService {
         }
 
     }
-
-//    private String getScopes(User user) {
-//
-//        StringJoiner stringJoiner = new StringJoiner(" ");
-//
-//        if(user.getRoles() != null) {
-//
-//            user.getRoles().forEach(role -> {
-//                stringJoiner.add(role.toString());
-//            });
-//        }
-//
-//        return stringJoiner.toString();
-//    }
 
     // Xác thực token
     public Message verifyToken(VerifyRequest verifyRequest) {

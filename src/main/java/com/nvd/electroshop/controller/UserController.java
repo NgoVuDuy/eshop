@@ -4,8 +4,7 @@ import com.nvd.electroshop.dto.request.UpdateUserRequest;
 import com.nvd.electroshop.dto.request.UserRequest;
 import com.nvd.electroshop.dto.response.ApiResponse;
 import com.nvd.electroshop.dto.response.Message;
-import com.nvd.electroshop.dto.response.UserReponse;
-import com.nvd.electroshop.entity.User;
+import com.nvd.electroshop.dto.response.UserResponse;
 import com.nvd.electroshop.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,30 +23,37 @@ public class UserController {
     @GetMapping
     // Admin
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<ApiResponse<List<UserReponse>>> getAllUsers() {
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
 
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<ApiResponse<UserReponse>> getUserById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<UserResponse>> getUserById(@PathVariable Long id) {
 
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @PostMapping
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<ApiResponse<UserReponse>> createUser(@RequestBody UserRequest userRequest) {
+    public ResponseEntity<ApiResponse<UserResponse>> createUser(@RequestBody UserRequest userRequest) {
 
         return ResponseEntity.ok(userService.createUser(userRequest));
     }
 
     @PutMapping("{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<ApiResponse<UserReponse>> updateUser(@PathVariable Long id, @RequestBody UserRequest userRequest) {
+    public ResponseEntity<ApiResponse<UserResponse>> updateUser(@PathVariable Long id, @RequestBody UserRequest userRequest) {
 
         return ResponseEntity.ok(userService.updateUser(id, userRequest));
+    }
+
+    @PatchMapping("{id}")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public ResponseEntity<ApiResponse<UserResponse>> partialUpdateUser(@PathVariable Long id, @RequestBody UserRequest userRequest) {
+
+        return ResponseEntity.ok(userService.partialUpdateUser(id, userRequest));
     }
 
     @DeleteMapping("{id}")
@@ -59,14 +65,14 @@ public class UserController {
 
     @GetMapping("/profile")
     // User
-    public ResponseEntity<ApiResponse<UserReponse>> getProfile() {
+    public ResponseEntity<ApiResponse<UserResponse>> getProfile() {
 
         return ResponseEntity.ok(userService.getProfile());
     }
 
-    @PutMapping("/update")
+    @PatchMapping("/update")
     //user
-    public ResponseEntity<ApiResponse<UserReponse>> updateProfile(@RequestBody UpdateUserRequest updateUserRequest) {
+    public ResponseEntity<ApiResponse<UserResponse>> updateProfile(@RequestBody UpdateUserRequest updateUserRequest) {
 
         return ResponseEntity.ok(userService.updateProfile(updateUserRequest));
     }

@@ -45,9 +45,11 @@ public class OrderItemMapper {
     // request
     public OrderItem mapToOrderItem(Order order, OrderItemRequest orderItemRequest) {
 
-        Product product = globalService.getProductById(orderItemRequest.getProductId());
 
+        Product product = globalService.getProductById(orderItemRequest.getProductId());
         Double price = product.getPrice() * orderItemRequest.getQuantity();
+
+        //
 
         return OrderItem.builder()
                 .product(product)

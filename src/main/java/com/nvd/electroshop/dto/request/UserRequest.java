@@ -16,8 +16,6 @@ import java.time.LocalDate;
 @Builder
 public class UserRequest {
 
-    private Long id;
-
     private String username;
     private String password;
 

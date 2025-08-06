@@ -63,10 +63,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public ApiResponse<OrderResponse> createUserOrder(OrderRequest orderRequest) {
 
-        Double totalOrder = getTotalOrder(orderRequest);
-        User user = globalService.getUserByToken();
-        LocalDateTime order_datetime = LocalDateTime.now();
-        OrderStatus orderStatus = OrderStatus.PENDING;
+        Double totalOrder = getTotalOrder(orderRequest); // Tính tổng giá của đơn hàng
+        User user = globalService.getUserByToken(); // Lấy ra thông tin người dùng
+        LocalDateTime order_datetime = LocalDateTime.now(); // Lấy thời gian hiện tại
+        OrderStatus orderStatus = OrderStatus.PENDING; // Trạng thái đơn hàng
 
         Order order = Order.builder()
                 .order_datetime(order_datetime)

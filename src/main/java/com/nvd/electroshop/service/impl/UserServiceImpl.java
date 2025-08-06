@@ -4,12 +4,17 @@ import com.nvd.electroshop.dto.request.UpdateUserRequest;
 import com.nvd.electroshop.dto.request.UserRequest;
 import com.nvd.electroshop.dto.response.ApiResponse;
 import com.nvd.electroshop.dto.response.Message;
-import com.nvd.electroshop.dto.response.UserReponse;
+import com.nvd.electroshop.dto.response.UserResponse;
 import com.nvd.electroshop.entity.User;
+import com.nvd.electroshop.exception.BadRequestException;
+import com.nvd.electroshop.exception.ConflictException;
+import com.nvd.electroshop.exception.ResourceNotFoundException;
+import com.nvd.electroshop.mapper.UserMapper;
 import com.nvd.electroshop.repository.UserRepository;
+import com.nvd.electroshop.service.GlobalService;
 import com.nvd.electroshop.service.UserService;
+import org.hibernate.sql.Update;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,239 +31,148 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private GlobalService globalService;
 
     @Override
     // Admin
-    public ApiResponse<List<UserReponse>> getAllUsers() {
+    public ApiResponse<List<UserResponse>> getAllUsers() {
 
-        List<User> userIterable = userRepository.findAll();
+        List<User> userList = userRepository.findAll();
 
-        List<UserReponse> userReponseList = new ArrayList<>();
-
-        userIterable.forEach(user -> {
-
-            UserReponse userReponse = UserReponse.builder()
-                    .id(user.getId())
-                    .username(user.getUsername())
-                    .phone(user.getPhone())
-                    .address(user.getAddress())
-                    .birthDate(user.getBirthDate())
-                    .role(user.getRole())
-                    .build();
-
-            userReponseList.add(userReponse);
-        });
+        List<UserResponse> userReponseList = userMapper.mapToUserResponseList(userList);
 
         return new ApiResponse<>(1, userReponseList);
     }
 
     @Override
     // Admin
-    public ApiResponse<UserReponse> getUserById(Long id) {
+    public ApiResponse<UserResponse> getUserById(Long id) {
 
-        Optional<User> userOptional = userRepository.findById(id);
-
-        if(userOptional.isEmpty()) {
-            throw new RuntimeException("Không tìm thấy người dùng để lấy thông tin");
-
-        }
-
-        User user = userOptional.get();
-
-        UserReponse userReponse = UserReponse.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .phone(user.getPhone())
-                .address(user.getAddress())
-                .birthDate(user.getBirthDate())
-                .role(user.getRole())
-                .build();
+        User user = getUser(id);
+        UserResponse userReponse = userMapper.mapToUserResponse(user);
 
         return new ApiResponse<>(1, userReponse);
     }
 
     @Override
     // Admin
-    public ApiResponse<UserReponse> createUser(UserRequest userRequest) {
+    public ApiResponse<UserResponse> createUser(UserRequest userRequest) {
 
         if (userRepository.existsByUsername(userRequest.getUsername())) {
 
-            throw new RuntimeException("Tên người dùng đã tồn tại");
+            throw new ConflictException("Tên người dùng đã tồn tại");
         }
-        User user = User.builder()
-                .username(userRequest.getUsername())
-                .password(userRequest.getPassword())
-                .phone(userRequest.getPhone())
-                .address(userRequest.getAddress())
-                .birthDate(userRequest.getBirthDate())
-                .role(userRequest.getRole())
-                .build();
+        User user = userMapper.mapToUser(userRequest);
 
         user = userRepository.save(user);
 
-        UserReponse userReponse = UserReponse.builder()
-                .username(user.getUsername())
-                .phone(user.getPhone())
-                .address(user.getAddress())
-                .birthDate(user.getBirthDate())
-                .role(user.getRole())
-                .build();
+        UserResponse userReponse = userMapper.mapToUserResponse(user);
 
         return new ApiResponse<>(1, userReponse);
     }
 
     @Override
     // Admin
-    public ApiResponse<UserReponse> updateUser(Long id, UserRequest userRequest) {
+    public ApiResponse<UserResponse> updateUser(Long id, UserRequest userRequest) {
 
-        Optional<User> userOptional = userRepository.findById(id);
-
-        if(userOptional.isEmpty()) {
-
-            throw new RuntimeException("Không tìm thấy người dùng để cập nhật");
-
-        }
-
-        User user = userOptional.get();
-
-        if(userRequest.getPhone() != null) user.setPhone(userRequest.getPhone());
-        if(userRequest.getAddress() != null) user.setAddress(userRequest.getAddress());
-        if(userRequest.getBirthDate() != null) user.setBirthDate(userRequest.getBirthDate());
-        if(userRequest.getRole() != null) user.setRole(userRequest.getRole());
-
-        if(userRequest.getUsername() != null) user.setUsername(userRequest.getUsername());
-        if(userRequest.getPassword() != null) user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+        User user = getUser(id);
+        user = userMapper.mapToUser(userRequest, user);
 
         user = userRepository.save(user);
 
-        UserReponse userReponse = UserReponse.builder()
-                .username(user.getUsername())
-                .phone(user.getPhone())
-                .address(user.getAddress())
-                .birthDate(user.getBirthDate())
-                .role(user.getRole())
-                .build();
+        UserResponse userReponse = userMapper.mapToUserResponse(user);
 
         return new ApiResponse<>(1, userReponse);
     }
 
     @Override
-    public Message deleteUser(Long id) {
+    public ApiResponse<UserResponse> partialUpdateUser(Long id, UserRequest userRequest) {
 
-        Optional<User> userOptional = userRepository.findById(id);
+        User user = getUser(id);
+        user = userMapper.mapToUserRequireNonNull(userRequest, user);
 
-        if(userOptional.isPresent()) {
+        user = userRepository.save(user);
 
-            userRepository.delete(userOptional.get());
+        UserResponse userResponse = userMapper.mapToUserResponse(user);
+        return null;
+    }
 
-            return new Message(1, "Xóa người dùng thành công");
-        } else {
+    @Override
+    public Message deleteUser(Long id) { // Xóa người dùng
 
-            throw new RuntimeException("Không tìm thấy người dùng để xóa");
-        }
+        userRepository.deleteById(id);
+
+        return new Message(1, "Xóa người dùng thành công");
     }
 
     @Override
     // User
-    public ApiResponse<UserReponse> getProfile() {
+    public ApiResponse<UserResponse> getProfile() {
 
-        SecurityContext securityContext = SecurityContextHolder.getContext();
+        User user = globalService.getUserByToken();
 
-        String username = securityContext.getAuthentication().getName();
-
-        Optional<User> userOptional = userRepository.findByUsername(username);
-
-        if (userOptional.isEmpty()) {
-
-            throw new RuntimeException("Không tìm thấy người dùng");
-        }
-
-        User user = userOptional.get();
-
-        UserReponse userReponse = UserReponse.builder()
-                .username(user.getUsername())
-                .phone(user.getPhone())
-                .address(user.getAddress())
-                .birthDate(user.getBirthDate())
-                .role(user.getRole())
-                .build();
+        UserResponse userReponse = userMapper.mapToUserResponse(user);
 
         return new ApiResponse<>(1, userReponse);
     }
 
     @Override
     // User
-    public ApiResponse<UserReponse> updateProfile(UpdateUserRequest updateUserRequest) {
+    public ApiResponse<UserResponse> updateProfile(UpdateUserRequest updateUserRequest) {
 
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-
-        String username = securityContext.getAuthentication().getName();
-
-        Optional<User> userOptional = userRepository.findByUsername(username);
-
-        if (userOptional.isEmpty()) {
-
-            throw new RuntimeException("Không tìm thấy người dùng để cập nhật");
-        }
-
-        User user = userOptional.get();
+        User user = globalService.getUserByToken();
 
         if(updateUserRequest.getUsername() != null) {
 
             if (userRepository.existsByUsername(updateUserRequest.getUsername())) {
-                throw new RuntimeException("Tên người dùng đã tồn tại");
-            } else {
-
-                user.setUsername(updateUserRequest.getUsername());
+                throw new ConflictException("Tên người dùng đã tồn tại");
             }
         }
 
         if(updateUserRequest.getPassword() != null && updateUserRequest.getOldPassword() != null) {
 
             if(!passwordEncoder.matches(updateUserRequest.getOldPassword(), user.getPassword())) {
-                throw new RuntimeException("Mật khẩu không trùng khớp");
-            } else {
-                user.setPassword(passwordEncoder.encode(updateUserRequest.getPassword()));
+                throw new BadRequestException("Mật khẩu không trùng khớp");
             }
         }
 
-        if(updateUserRequest.getPhone() != null) user.setPhone(updateUserRequest.getPhone());
-        if(updateUserRequest.getAddress() != null) user.setAddress(updateUserRequest.getAddress());
-        if(updateUserRequest.getBirthDate() != null) user.setBirthDate(updateUserRequest.getBirthDate());
-
+        user = userMapper.mapToUserRequireNonNull(updateUserRequest, user);
         user = userRepository.save(user);
 
-        UserReponse userReponse = UserReponse.builder()
-                .username(user.getUsername())
-                .phone(user.getPhone())
-                .address(user.getAddress())
-                .birthDate(user.getBirthDate())
-                .role(user.getRole())
-                .build();
+        UserResponse userReponse = userMapper.mapToUserResponse(user);
 
         return new ApiResponse<>(1, userReponse);
-
     }
 
     @Override
     // User
-    public Message deleteProfile() {
+    public Message deleteProfile() { // Khóa người dùng
 
-        SecurityContext securityContext = SecurityContextHolder.getContext();
+        User user = globalService.getUserByToken();
 
-        String username = securityContext.getAuthentication().getName();
+        user.setDelete(true);
 
-        Optional<User> userOptional = userRepository.findByUsername(username);
+        user = userRepository.save(user);
 
-        if (userOptional.isPresent()) {
+        return new Message(1, "Bạn đã xóa tài khoản thành công");
+    }
 
-            userRepository.delete(userOptional.get());
+    // ins
+    private User getUser(Long id) {
 
-            return new Message(1, "Xóa người dùng thành công");
-        } else {
+        Optional<User> userOptional = userRepository.findById(id);
 
-            throw new RuntimeException("Không tìm thấy người dùng để xóa");
+        if(userOptional.isEmpty()) {
+            throw new ResourceNotFoundException("Không tìm thấy người dùng để lấy thông tin");
+
         }
+
+        return userOptional.get();
     }
 }
