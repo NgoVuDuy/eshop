@@ -1,6 +1,7 @@
 package com.nvd.electroshop.controller;
 
 import com.nvd.electroshop.dto.request.AuthRequest;
+import com.nvd.electroshop.dto.request.LogoutRequest;
 import com.nvd.electroshop.dto.request.VerifyRequest;
 import com.nvd.electroshop.dto.response.ApiResponse;
 import com.nvd.electroshop.dto.response.AuthResponse;
@@ -31,6 +32,12 @@ public class AuthController {
     public ResponseEntity<ApiResponse<AuthResponse>> login (@RequestBody AuthRequest authRequest) {
 
         return ResponseEntity.ok(authService.login(authRequest));
+    }
+
+    @PostMapping("logout")
+    public ResponseEntity<Message> logout(@RequestBody LogoutRequest logoutRequest) {
+
+        return ResponseEntity.ok(authService.logout(logoutRequest));
     }
 
     @PostMapping("token/verify")

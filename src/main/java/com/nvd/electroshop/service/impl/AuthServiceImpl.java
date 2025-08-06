@@ -6,25 +6,30 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.nvd.electroshop.dto.request.AuthRequest;
+import com.nvd.electroshop.dto.request.LogoutRequest;
 import com.nvd.electroshop.dto.request.VerifyRequest;
 import com.nvd.electroshop.dto.response.ApiResponse;
 import com.nvd.electroshop.dto.response.AuthResponse;
 import com.nvd.electroshop.dto.response.Message;
+import com.nvd.electroshop.entity.BlackListToken;
 import com.nvd.electroshop.entity.User;
 import com.nvd.electroshop.exception.BadRequestException;
 import com.nvd.electroshop.repository.AuthRepository;
+import com.nvd.electroshop.repository.BlackListTokenRepository;
 import com.nvd.electroshop.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.xml.crypto.Data;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Optional;
 import java.util.StringJoiner;
+import java.util.UUID;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -34,6 +39,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private BlackListTokenRepository blackListTokenRepository;
 
     @Value("${jwt.secretKey}")
     private String secretKey;
@@ -65,7 +73,7 @@ public class AuthServiceImpl implements AuthService {
 
         Optional<User> userOptional = authRepository.findByUsername(authRequest.getUsername());
 
-        if(userOptional.isEmpty()) { // kiểm tra tên tài khoản
+        if (userOptional.isEmpty()) { // kiểm tra tên tài khoản
             throw new BadRequestException("Tên tài khoản hoặc mật khẩu không đúng");
         }
 
@@ -74,7 +82,7 @@ public class AuthServiceImpl implements AuthService {
             throw new BadRequestException("Tên tài khoản hoặc mật khẩu không đúng");
         }
 
-        if(!passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) { // Kiểm tra mật khẩu
+        if (!passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) { // Kiểm tra mật khẩu
 
             throw new BadRequestException("Tên tài khoản hoặc mật khẩu không đúng");
         }
@@ -85,7 +93,34 @@ public class AuthServiceImpl implements AuthService {
                 AuthResponse.builder()
                         .token(token)
                         .build()
-                );
+        );
+    }
+
+    @Override
+    public Message logout(LogoutRequest logoutRequest) {
+
+        // parse token lấy id và expiration time
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(logoutRequest.getToken());
+
+            JWTClaimsSet jwtClaimsSet = signedJWT.getJWTClaimsSet();
+
+            String idToken = jwtClaimsSet.getJWTID();
+            Date expirationTime = jwtClaimsSet.getExpirationTime();
+
+            BlackListToken blackListToken = BlackListToken.builder()
+                    .id(idToken)
+                    .expirationTime(expirationTime)
+                    .build();
+
+            blackListTokenRepository.save(blackListToken);
+
+        } catch (ParseException e) {
+            throw new RuntimeException("Lỗi parse token");
+        }
+        // đưa vào backlist
+
+        return new Message(1, "Đăng xuất thành công");
     }
 
     // Tạo token
@@ -93,14 +128,13 @@ public class AuthServiceImpl implements AuthService {
 
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
 
-//        System.out.println(jwsHeader);
-
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getUsername())
                 .issuer("eshop.com")
                 .issueTime(new Date())
                 .expirationTime(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
                 .claim("scope", user.getRole())
+                .jwtID(UUID.randomUUID().toString())
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
@@ -132,9 +166,17 @@ public class AuthServiceImpl implements AuthService {
 
             // Tạo verifier
             JWSVerifier jwsVerifier = new MACVerifier(secretKey.getBytes());
+            JWTClaimsSet jwtClaimsSet = signedJWT.getJWTClaimsSet();
+
+            String idToken = jwtClaimsSet.getJWTID();
+            // Kiểm tra xem token có trong blacklist không
+            if (blackListTokenRepository.existsById(idToken)) {
+
+                return new Message(0, "Token không còn hiệu lực");
+            }
 
             // Kiểm tra hết hạn
-            boolean isExpiry = signedJWT.getJWTClaimsSet()
+            boolean isExpiry = jwtClaimsSet
                     .getExpirationTime()
                     .after(new Date());
 

@@ -27,13 +27,8 @@ public class SecurityConfig {
     private final String[] PERMIT_END_POINTS = {
 
             "/auth/**",
-
             "/swagger-ui/**",
             "/v3/api-docs/**",
-//            "/swagger-ui.html",
-//            "/v3/api-docs.yaml",
-//            "/swagger-resources/**",
-//            "/webjars/**"
     } ;
 
     @Autowired
@@ -46,7 +41,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PERMIT_END_POINTS).permitAll()
 //                        .requestMatchers(HttpMethod.GET, "/categories").hasAuthority("SCOPE_ADMIN")
-                        .anyRequest().authenticated() // Những đường khác thì cần login
+                        .anyRequest().authenticated() // Những đường khác thì cần xác thực
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwtConfigurer -> jwtConfigurer
