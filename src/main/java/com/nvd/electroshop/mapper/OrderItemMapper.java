@@ -33,7 +33,7 @@ public class OrderItemMapper {
         return OrderItemResponse.builder()
                 .product(productResponse)
                 .quantity(orderItem.getQuantity())
-                .price(orderItem.getPrice())
+                .price(globalService.formatCurrency(orderItem.getPrice()))
                 .build();
     }
 

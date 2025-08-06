@@ -11,5 +11,5 @@ public class OrderItemResponse {
 
     private ProductResponse product;
     private int quantity;
-    private Double price;
+    private String price;
 }

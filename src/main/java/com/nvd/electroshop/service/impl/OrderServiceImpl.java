@@ -16,7 +16,9 @@ import com.nvd.electroshop.exception.ConflictException;
 import com.nvd.electroshop.exception.ResourceNotFoundException;
 import com.nvd.electroshop.mapper.OrderItemMapper;
 import com.nvd.electroshop.mapper.OrderMapper;
+import com.nvd.electroshop.mapper.ProductMapper;
 import com.nvd.electroshop.repository.OrderRepository;
+import com.nvd.electroshop.repository.ProductRepository;
 import com.nvd.electroshop.service.GlobalService;
 import com.nvd.electroshop.service.OrderService;
 import org.springframework.stereotype.Service;
@@ -32,17 +34,23 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemMapper orderItemMapper;
     private final OrderMapper orderMapper;
+    private final ProductMapper productMapper;
+    private final ProductRepository productRepository;
 
     public OrderServiceImpl(
             GlobalService globalService,
             OrderRepository orderRepository,
             OrderItemMapper orderItemMapper,
-            OrderMapper orderMapper
+            OrderMapper orderMapper,
+            ProductMapper productMapper,
+            ProductRepository productRepository
     ) {
         this.globalService = globalService;
         this.orderRepository = orderRepository;
         this.orderItemMapper = orderItemMapper;
         this.orderMapper = orderMapper;
+        this.productMapper = productMapper;
+        this.productRepository = productRepository;
     }
 
     @Override
@@ -75,11 +83,22 @@ public class OrderServiceImpl implements OrderService {
                 .user(user)
                 .build();
 
-        List<OrderItem> orderItemList = orderItemMapper.mapToOrderItemList(order, orderRequest.getOrderItemRequestList());
+        List<OrderItemRequest> orderItemRequestList = orderRequest.getOrderItemRequestList();
 
+        List<OrderItem> orderItemList = orderItemMapper.mapToOrderItemList(order, orderItemRequestList);
         order.setOrderItems(orderItemList);
-
         order = orderRepository.save(order);
+
+        // Cập nhật lại số lượng sản phẩm trong kho
+        for (OrderItemRequest orderItemRequest : orderItemRequestList) {
+
+            int quantity = orderItemRequest.getQuantity();
+            Product product = globalService.getProductById(orderItemRequest.getProductId());
+
+            product.setStockQuantity(product.getStockQuantity() - quantity);
+
+            productRepository.save(product);
+        }
 
         OrderResponse orderResponse = orderMapper.mapToOrderResponse(order);
 
@@ -109,6 +128,16 @@ public class OrderServiceImpl implements OrderService {
         if(order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.CONFIRMED) {
 
             throw new ConflictException("Bạn không thể hủy đơn hàng này");
+        }
+        // Cập nhật lại số lượng kho
+        List<OrderItem> orderItemList = order.getOrderItems();
+        for (OrderItem orderItem : orderItemList) {
+
+            Product product = orderItem.getProduct();
+
+            product.setStockQuantity(product.getStockQuantity() + orderItem.getQuantity());
+
+            productRepository.save(product);
         }
 
         orderRepository.delete(order);
