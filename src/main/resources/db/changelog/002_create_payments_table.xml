@@ -37,7 +37,10 @@
                 onUpdate="RESTRICT"
         />
         <rollback>
-            <dropForeignKeyConstraint baseTableName="payments"/>
+            <dropForeignKeyConstraint
+                    baseTableName="payments"
+                    constraintName="fk_payments_order"
+            />
         </rollback>
     </changeSet>
 </databaseChangeLog>

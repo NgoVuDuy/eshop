@@ -76,6 +76,7 @@ public class UserController {
 
         return ResponseEntity.ok(userService.updateProfile(updateUserRequest));
     }
+
     @DeleteMapping("/delete")
     //user
     public ResponseEntity<Message> deleteProfile() {

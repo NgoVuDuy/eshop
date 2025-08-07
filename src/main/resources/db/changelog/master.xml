@@ -4,7 +4,7 @@
 
 <!--    <include file="db/changelog/001_initial_schema.xml"-->
 <!--             relativeToChangelogFile="false"/>-->
-    <include file="db/changelog/002_create_payments_table.xml"
-             relativeToChangelogFile="false"/>
+    <include file="002_create_payments_table.xml"
+             relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

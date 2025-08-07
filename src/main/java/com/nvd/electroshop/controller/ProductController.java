@@ -5,6 +5,7 @@ import com.nvd.electroshop.dto.response.*;
 import com.nvd.electroshop.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,12 +30,14 @@ public class ProductController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<ApiResponse<ProductResponse>> createProduct(@RequestBody ProductRequest productRequest) {
 
         return ResponseEntity.ok(productService.createProduct(productRequest));
     }
 
     @PutMapping("{id}")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(@PathVariable Long id, @RequestBody ProductRequest productRequest) {
 
         return ResponseEntity.ok(productService.updateProduct(id, productRequest)) ;
@@ -63,6 +66,7 @@ public class ProductController {
     }
 
     @DeleteMapping("{id}")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<Message> deleteProduct(@PathVariable Long id) {
 
         return ResponseEntity.ok(productService.deleteProduct(id));

@@ -9,6 +9,7 @@ import com.nvd.electroshop.service.OrderService;
 import org.hibernate.sql.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,11 +46,13 @@ public class OrderController {
 
     // admin
     @GetMapping("/orders")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<ApiResponse<List<OrderResponse>>> getAllOrders() {
         return ResponseEntity.ok(orderService.getAllOrders());
     }
 
     @PatchMapping("/orders/{orderId}/status")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<ApiResponse<OrderResponse>> updateOrderStatus(@PathVariable Long orderId, @RequestBody UpdateOrderStatusRequest updateOrderStatusRequest) {
 
         return ResponseEntity.ok(orderService.updateOrderStatus(orderId, updateOrderStatusRequest));
