@@ -1,0 +1,43 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="
+                   http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
+>
+    <changeSet id="1" author="ASUS (generated)">
+        <createTable tableName="payments">
+            <column name="id" autoIncrement="true" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+
+            <column name="order_id" type="BIGINT"/>
+            <column name="paid_at" type="datetime(6)"/>
+            <column name="status" type="ENUM('PENDING', 'SUCCESS', 'FAIL')"/>
+            <column name="amount" type="DOUBLE"/>
+            <column name="method" type="ENUM('VNPAY', 'COD')"/>
+        </createTable>
+
+        <rollback>
+            <dropTable tableName="payments"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2" author="ASUS (generated)">
+        <addForeignKeyConstraint
+                baseTableName="payments"
+                baseColumnNames="order_id"
+                constraintName="fk_payments_order"
+                referencedTableName="orders"
+                referencedColumnNames="id"
+                validate="true"
+                deferrable="false"
+                initiallyDeferred="false"
+                onDelete="RESTRICT"
+                onUpdate="RESTRICT"
+        />
+        <rollback>
+            <dropForeignKeyConstraint baseTableName="payments"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

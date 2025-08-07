@@ -4,7 +4,7 @@
 
 <!--    <include file="db/changelog/001_initial_schema.xml"-->
 <!--             relativeToChangelogFile="false"/>-->
-<!--    <include file="classpath:config/liquibase/changelog/20170503041524_added_entity_Car.xml"-->
-<!--             relativeToChangelogFile="false"/>-->
+    <include file="db/changelog/002_create_payments_table.xml"
+             relativeToChangelogFile="false"/>
 
 </databaseChangeLog>
