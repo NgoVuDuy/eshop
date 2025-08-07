@@ -1,4 +1,4 @@
-package com.nvd.electroshop.dto.request;
+package com.nvd.electroshop.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LogoutRequest {
+public class RefreshTokenResponse {
 
     private String accessToken;
-    private String refreshToken;
 }

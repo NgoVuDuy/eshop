@@ -2,10 +2,9 @@ package com.nvd.electroshop.controller;
 
 import com.nvd.electroshop.dto.request.AuthRequest;
 import com.nvd.electroshop.dto.request.LogoutRequest;
+import com.nvd.electroshop.dto.request.RefreshTokenRequest;
 import com.nvd.electroshop.dto.request.VerifyRequest;
-import com.nvd.electroshop.dto.response.ApiResponse;
-import com.nvd.electroshop.dto.response.AuthResponse;
-import com.nvd.electroshop.dto.response.Message;
+import com.nvd.electroshop.dto.response.*;
 import com.nvd.electroshop.entity.User;
 import com.nvd.electroshop.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +39,14 @@ public class AuthController {
         return ResponseEntity.ok(authService.logout(logoutRequest));
     }
 
+    @PostMapping("refresh")
+    public ResponseEntity<ApiResponse<RefreshTokenResponse>> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+
+        return ResponseEntity.ok(authService.refresh(refreshTokenRequest));
+    }
+
     @PostMapping("token/verify")
-    public ResponseEntity<Message> verifyToken(@RequestBody VerifyRequest verifyRequest) {
+    public ResponseEntity<ApiResponse<VerifyResponse>> verifyToken(@RequestBody VerifyRequest verifyRequest) {
 
         return ResponseEntity.ok(authService.verifyToken(verifyRequest));
     }
