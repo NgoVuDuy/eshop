@@ -1,0 +1,382 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="
+                   http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
+>
+    <changeSet author="ASUS (generated)" id="1754536819613-1">
+        <createTable tableName="attribute_category">
+            <column name="attribute_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="category_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-2">
+        <createTable tableName="attribute_product">
+            <column name="value" type="DOUBLE"/>
+            <column name="attribute_id" type="BIGINT"/>
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="product_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-3">
+        <createTable tableName="attributes">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="unit" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-4">
+        <createTable tableName="blacklist_tokens">
+            <column name="id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="expiration_time" type="datetime(6)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-5">
+        <createTable tableName="brands">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-6">
+        <createTable tableName="cart_items">
+            <column name="quantity" type="INT"/>
+            <column name="cart_id" type="BIGINT"/>
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="product_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-7">
+        <createTable tableName="carts">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints unique="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-8">
+        <createTable tableName="categories">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-9">
+        <createTable tableName="category_brand">
+            <column name="brand_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="category_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-10">
+        <createTable tableName="category_product">
+            <column name="category_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="product_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-11">
+        <createTable tableName="order_items">
+            <column name="price" type="DOUBLE"/>
+            <column name="quantity" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="order_id" type="BIGINT"/>
+            <column name="product_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-12">
+        <createTable tableName="orders">
+            <column name="total" type="DOUBLE"/>
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="order_datetime" type="datetime(6)"/>
+            <column name="user_id" type="BIGINT"/>
+            <column name="status" type="ENUM('CANCELLED', 'CONFIRMED', 'DELIVERED', 'PENDING', 'SHIPPED')"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-13">
+        <createTable tableName="product_images">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="product_id" type="BIGINT"/>
+            <column name="public_id" type="VARCHAR(255)"/>
+            <column name="url" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-14">
+        <createTable tableName="products">
+            <column name="price" type="DOUBLE"/>
+            <column name="brand_id" type="BIGINT"/>
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="stock_quantity" type="BIGINT"/>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-15">
+        <createTable tableName="reviews">
+            <column name="rating" type="INT"/>
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="product_id" type="BIGINT"/>
+            <column name="user_id" type="BIGINT"/>
+            <column name="comment" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-16">
+        <createTable tableName="users">
+            <column name="birth_date" type="date"/>
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="address" type="VARCHAR(255)"/>
+            <column name="password" type="VARCHAR(255)"/>
+            <column name="phone" type="VARCHAR(255)"/>
+            <column name="username" type="VARCHAR(255)"/>
+            <column name="role" type="ENUM('ADMIN', 'USER')"/>
+            <column name="is_delete" type="BIT(1)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-17">
+        <createTable tableName="wishlists">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="product_id" type="BIGINT"/>
+            <column name="user_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-18">
+        <createIndex associatedWith="" indexName="FK1re40cjegsfvw58xrkdp6bac6" tableName="cart_items">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-19">
+        <createIndex associatedWith="" indexName="FK2ehd4kns715ksgw0dv1005ig6" tableName="attribute_category">
+            <column name="category_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-20">
+        <createIndex associatedWith="" indexName="FK32ql8ubntj5uh44ph9659tiih" tableName="orders">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-21">
+        <createIndex associatedWith="" indexName="FK330pyw2el06fn5g28ypyljt16" tableName="wishlists">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-22">
+        <createIndex associatedWith="" indexName="FK8lxtcgpbo1ukpg0wfrxexpwks" tableName="category_product">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-23">
+        <createIndex associatedWith="" indexName="FKa3a4mpsfdf4d2y6r8ra3sc8mv" tableName="products">
+            <column name="brand_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-24">
+        <createIndex associatedWith="" indexName="FKbioxgbv59vetrxe0ejfubep1w" tableName="order_items">
+            <column name="order_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-25">
+        <createIndex associatedWith="" indexName="FKcgy7qjc1r99dp117y9en6lxye" tableName="reviews">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-26">
+        <createIndex associatedWith="" indexName="FKd0b7ch8cx4mrhs52gyvxjh9dm" tableName="category_brand">
+            <column name="category_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-27">
+        <createIndex associatedWith="" indexName="FKjrciaa964itmkt8mpnke13udy" tableName="attribute_product">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-28">
+        <createIndex associatedWith="" indexName="FKl7ao98u2bm8nijc1rv4jobcrx" tableName="wishlists">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-29">
+        <createIndex associatedWith="" indexName="FKocimc7dtr037rh4ls4l95nlfi" tableName="order_items">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-30">
+        <createIndex associatedWith="" indexName="FKpcttvuq4mxppo8sxggjtn5i2c" tableName="cart_items">
+            <column name="cart_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-31">
+        <createIndex associatedWith="" indexName="FKpl51cejpw4gy5swfar8br9ngi" tableName="reviews">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-32">
+        <createIndex associatedWith="" indexName="FKqnq71xsohugpqwf3c9gxmsuy" tableName="product_images">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-33">
+        <createIndex associatedWith="" indexName="FKrwdy04hgbom13n9vda1t6errv" tableName="attribute_product">
+            <column name="attribute_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-34">
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="cart_items"
+                                 constraintName="FK1re40cjegsfvw58xrkdp6bac6" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="products" validate="true"/>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-35">
+        <addForeignKeyConstraint baseColumnNames="category_id" baseTableName="attribute_category"
+                                 constraintName="FK2ehd4kns715ksgw0dv1005ig6" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="categories" validate="true"/>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-36">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="orders"
+                                 constraintName="FK32ql8ubntj5uh44ph9659tiih" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="users" validate="true"/>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-37">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="wishlists"
+                                 constraintName="FK330pyw2el06fn5g28ypyljt16" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="users" validate="true"/>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-38">
+        <addForeignKeyConstraint baseColumnNames="brand_id" baseTableName="category_brand"
+                                 constraintName="FK756hw9s5745n3jo3qq92nl3ue" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="brands" validate="true"/>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-39">
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="category_product"
+                                 constraintName="FK8lxtcgpbo1ukpg0wfrxexpwks" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="products" validate="true"/>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-40">
+        <addForeignKeyConstraint baseColumnNames="brand_id" baseTableName="products"
+                                 constraintName="FKa3a4mpsfdf4d2y6r8ra3sc8mv" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="brands" validate="true"/>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-41">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="carts"
+                                 constraintName="FKb5o626f86h46m4s7ms6ginnop" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="users" validate="true"/>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-42">
+        <addForeignKeyConstraint baseColumnNames="order_id" baseTableName="order_items"
+                                 constraintName="FKbioxgbv59vetrxe0ejfubep1w" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="orders" validate="true"/>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-43">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="reviews"
+                                 constraintName="FKcgy7qjc1r99dp117y9en6lxye" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="users" validate="true"/>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-44">
+        <addForeignKeyConstraint baseColumnNames="category_id" baseTableName="category_brand"
+                                 constraintName="FKd0b7ch8cx4mrhs52gyvxjh9dm" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="categories" validate="true"/>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-45">
+        <addForeignKeyConstraint baseColumnNames="attribute_id" baseTableName="attribute_category"
+                                 constraintName="FKdaskk5r9fle8gqhpmrmr7mx43" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="attributes" validate="true"/>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-46">
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="attribute_product"
+                                 constraintName="FKjrciaa964itmkt8mpnke13udy" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="products" validate="true"/>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-47">
+        <addForeignKeyConstraint baseColumnNames="category_id" baseTableName="category_product"
+                                 constraintName="FKklpmbe149uvb1bm5qev4d9qiu" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="categories" validate="true"/>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-48">
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="wishlists"
+                                 constraintName="FKl7ao98u2bm8nijc1rv4jobcrx" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="products" validate="true"/>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-49">
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="order_items"
+                                 constraintName="FKocimc7dtr037rh4ls4l95nlfi" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="products" validate="true"/>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-50">
+        <addForeignKeyConstraint baseColumnNames="cart_id" baseTableName="cart_items"
+                                 constraintName="FKpcttvuq4mxppo8sxggjtn5i2c" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="carts" validate="true"/>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-51">
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="reviews"
+                                 constraintName="FKpl51cejpw4gy5swfar8br9ngi" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="products" validate="true"/>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-52">
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="product_images"
+                                 constraintName="FKqnq71xsohugpqwf3c9gxmsuy" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="products" validate="true"/>
+    </changeSet>
+    <changeSet author="ASUS (generated)" id="1754536819613-53">
+        <addForeignKeyConstraint baseColumnNames="attribute_id" baseTableName="attribute_product"
+                                 constraintName="FKrwdy04hgbom13n9vda1t6errv" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="attributes" validate="true"/>
+    </changeSet>
+</databaseChangeLog>
