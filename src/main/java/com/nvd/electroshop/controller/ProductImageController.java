@@ -10,8 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @RestController
 @RequestMapping("/product-images")
@@ -19,12 +23,31 @@ public class ProductImageController {
 
     @Autowired
     private ProductImageService productImageService;
+    private ExecutorService executorService = Executors.newCachedThreadPool();
 
     @PostMapping("uploads")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<ApiResponse<List<ProductImageResponse>>> uploadProductImages(@ModelAttribute ProductImageRequest productImageRequest) {
+    public SseEmitter uploadProductImages(@ModelAttribute ProductImageRequest productImageRequest) {
 
-        return ResponseEntity.ok(productImageService.uploadProductImage(productImageRequest));
+        SseEmitter sseEmitter = new SseEmitter(0L);
+
+        executorService.execute(() -> {
+
+                    productImageService.uploadProductImages(productImageRequest, sseEmitter);
+                    try {
+                        sseEmitter.send(SseEmitter.event().name("Done").data(
+                                new Message(1, "Uploaded")
+                        ));
+                        sseEmitter.complete();
+
+                    } catch (IOException e) {
+                        throw new RuntimeException(e.getMessage());
+                    }
+                }
+        );
+
+        return sseEmitter;
+//        return ResponseEntity.ok(productImageService.uploadProductImage(productImageRequest));
     }
 
     @DeleteMapping("delete")

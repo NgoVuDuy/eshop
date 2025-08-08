@@ -9,16 +9,15 @@ import com.nvd.electroshop.dto.response.Message;
 import com.nvd.electroshop.dto.response.ProductImageResponse;
 import com.nvd.electroshop.entity.Product;
 import com.nvd.electroshop.entity.ProductImage;
-import com.nvd.electroshop.exception.ResourceNotFoundException;
 import com.nvd.electroshop.mapper.ProductImageMapper;
 import com.nvd.electroshop.repository.ProductImageRepository;
 import com.nvd.electroshop.service.GlobalService;
 import com.nvd.electroshop.service.ProductImageService;
-//import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.*;
@@ -26,27 +25,26 @@ import java.util.*;
 @Service
 public class ProductImageServiceImpl implements ProductImageService {
 
-    @Autowired
-    private ProductImageRepository productImageRepository;
-
-    @Autowired
-    private Cloudinary cloudinary;
-
-    @Autowired
-    private GlobalService globalService;
-
-    @Autowired
-    private ProductImageMapper productImageMapper;
-
+    private final ProductImageRepository productImageRepository;
+    private final Cloudinary cloudinary;
+    private final GlobalService globalService;
+    private final ProductImageMapper productImageMapper;
     private final String folder = "eshop/products";
 
+    public ProductImageServiceImpl(ProductImageRepository productImageRepository, Cloudinary cloudinary, GlobalService globalService, ProductImageMapper productImageMapper) {
+        this.productImageRepository = productImageRepository;
+        this.cloudinary = cloudinary;
+        this.globalService = globalService;
+        this.productImageMapper = productImageMapper;
+    }
+
     @Override
-    public ApiResponse<List<ProductImageResponse>> uploadProductImage(ProductImageRequest productImageRequest) {
+    public void uploadProductImages(ProductImageRequest productImageRequest, SseEmitter sseEmitter) {
 
-        Product product = globalService.getProductById(productImageRequest.getProductId());
+        Product product = globalService.getProductById(productImageRequest.getProductId()); // Lấy sản phẩm cần thêm hình
 
-        List<MultipartFile> files = productImageRequest.getProductImageFiles();
-        List<ProductImage> productImageList = new ArrayList<>();
+        List<MultipartFile> files = productImageRequest.getProductImageFiles(); // Lấy các file hình
+//        List<ProductImage> productImageList = new ArrayList<>();
 
         for (MultipartFile file : files) {
 
@@ -60,7 +58,7 @@ public class ProductImageServiceImpl implements ProductImageService {
                         "public_id", fileName,
                         "folder", folder
 
-                )).get("url").toString();
+                )).get("url").toString(); // upload lên cloudinary
 
                 ProductImage productImage = ProductImage.builder()
                         .url(url)
@@ -68,9 +66,16 @@ public class ProductImageServiceImpl implements ProductImageService {
                         .product(product)
                         .build();
 
-                productImage = productImageRepository.save(productImage);
+                productImage = productImageRepository.save(productImage); // Lưu url vào db
 
-                productImageList.add(productImage);
+//                productImageList.add(productImage);
+
+                ProductImageResponse productImageResponse = productImageMapper.mapToProductImageResponse(productImage);
+
+                //emit
+                sseEmitter.send(SseEmitter.event().name("uploaded").data(
+                        new ApiResponse<>(1, productImageResponse)
+                ));
 
             } catch (IOException e) {
 
@@ -78,8 +83,9 @@ public class ProductImageServiceImpl implements ProductImageService {
             }
         }
 
-        List<ProductImageResponse> productImageResponseList = productImageMapper.mapToProductImageResponseList(productImageList);
-        return new ApiResponse<>(1, productImageResponseList);
+        // Kết quả trả về
+//        List<ProductImageResponse> productImageResponseList = productImageMapper.mapToProductImageResponseList(productImageList);
+//        return new ApiResponse<>(1, productImageResponseList);
     }
 
     @Override
