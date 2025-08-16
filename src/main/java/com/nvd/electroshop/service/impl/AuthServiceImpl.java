@@ -12,6 +12,7 @@ import com.nvd.electroshop.dto.request.VerifyRequest;
 import com.nvd.electroshop.dto.response.*;
 import com.nvd.electroshop.entity.BlackListToken;
 import com.nvd.electroshop.entity.User;
+import com.nvd.electroshop.enums.Role;
 import com.nvd.electroshop.exception.BadRequestException;
 import com.nvd.electroshop.repository.AuthRepository;
 import com.nvd.electroshop.repository.BlackListTokenRepository;
@@ -55,7 +56,7 @@ public class AuthServiceImpl implements AuthService {
         User user = User.builder()
                 .username(authRequest.getUsername())
                 .password(passwordEd)
-                .role(authRequest.getRole())
+                .role(Role.USER)
                 .build();
 
         authRepository.save(user);

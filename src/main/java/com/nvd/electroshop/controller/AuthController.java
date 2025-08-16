@@ -7,6 +7,7 @@ import com.nvd.electroshop.dto.request.VerifyRequest;
 import com.nvd.electroshop.dto.response.*;
 import com.nvd.electroshop.entity.User;
 import com.nvd.electroshop.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +23,7 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("register")
-    public ResponseEntity<Message> register(@RequestBody AuthRequest authRequest) {
+    public ResponseEntity<Message> register(@Valid @RequestBody AuthRequest authRequest) {
 
         return ResponseEntity.ok(authService.register(authRequest));
     }

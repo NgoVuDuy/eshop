@@ -6,6 +6,7 @@ import com.nvd.electroshop.dto.response.ApiResponse;
 import com.nvd.electroshop.dto.response.Message;
 import com.nvd.electroshop.dto.response.UserResponse;
 import com.nvd.electroshop.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -72,7 +73,7 @@ public class UserController {
 
     @PatchMapping("/update")
     //user
-    public ResponseEntity<ApiResponse<UserResponse>> updateProfile(@RequestBody UpdateUserRequest updateUserRequest) {
+    public ResponseEntity<ApiResponse<UserResponse>> updateProfile(@Valid @RequestBody UpdateUserRequest updateUserRequest) {
 
         return ResponseEntity.ok(userService.updateProfile(updateUserRequest));
     }
