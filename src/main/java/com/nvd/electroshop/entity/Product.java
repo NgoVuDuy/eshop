@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -18,6 +20,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class Product {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

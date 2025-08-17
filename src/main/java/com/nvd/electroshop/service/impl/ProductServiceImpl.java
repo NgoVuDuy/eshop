@@ -12,6 +12,7 @@ import com.nvd.electroshop.repository.BrandRepository;
 import com.nvd.electroshop.repository.ProductRepository;
 import com.nvd.electroshop.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -47,7 +48,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable(value = "products", key = "'all'")
     public ApiResponse<List<ProductResponse>> getAllProducts(List<String> includes) {
+
+        System.out.println("get all product from database");
+
+        try { Thread.sleep(5000); } catch (InterruptedException ignored) {}
 
         List<Product> products = productRepository.findAll();
         List<ProductResponse> productResponseList = productMapper.mapToProductResponseList(products, includes);
@@ -56,7 +62,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable(value = "products", key = "#id")
     public ApiResponse<ProductResponse> getProductById(Long id, List<String> includes) {
+
+        System.out.println("get product from database");
 
         Product product = getProduct(id);
         ProductResponse productResponse = productMapper.mapToProductResponse(product, includes);

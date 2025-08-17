@@ -14,6 +14,7 @@ import com.nvd.electroshop.entity.BlackListToken;
 import com.nvd.electroshop.entity.User;
 import com.nvd.electroshop.enums.Role;
 import com.nvd.electroshop.exception.BadRequestException;
+import com.nvd.electroshop.exception.ConflictException;
 import com.nvd.electroshop.repository.AuthRepository;
 import com.nvd.electroshop.repository.BlackListTokenRepository;
 import com.nvd.electroshop.service.AuthService;
@@ -48,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
         Optional<User> userOptional = authRepository.findByUsername(authRequest.getUsername());
 
         if (userOptional.isPresent()) {
-            throw new RuntimeException("Tên tài khoản đã tồn tại");
+            throw new ConflictException("Tên tài khoản đã tồn tại");
         }
 
         String passwordEd = passwordEncoder.encode(authRequest.getPassword());
