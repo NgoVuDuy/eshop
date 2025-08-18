@@ -21,19 +21,26 @@ import java.util.*;
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
-    @Autowired
-    private CategoryRepository categoryRepository;
-    @Autowired
-    private CategoryMapper categoryMapper;
-    @Autowired
-    private BrandMapper brandMapper;
-    @Autowired
-    private AttributeMapper attributeMapper;
-    @Autowired
-    private ProductMapper productMapper;
+    private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
+    private final BrandMapper brandMapper;
+    private final AttributeMapper attributeMapper;
+    private final ProductMapper productMapper;
+
+    public CategoryServiceImpl(CategoryRepository categoryRepository,
+                               CategoryMapper categoryMapper,
+                               BrandMapper brandMapper,
+                               AttributeMapper attributeMapper,
+                               ProductMapper productMapper) {
+        this.categoryRepository = categoryRepository;
+        this.categoryMapper = categoryMapper;
+        this.brandMapper = brandMapper;
+        this.attributeMapper = attributeMapper;
+        this.productMapper = productMapper;
+    }
 
     @Override
-    public ApiResponse<List<CategoryResponse>>  getAllCategories(List<String> includes) {
+    public ApiResponse<List<CategoryResponse>> getAllCategories(List<String> includes) {
 
         List<Category> categoryList = categoryRepository.findAll();
         List<CategoryResponse> categoryResponseList = categoryMapper.mapToCategoryResponseList(categoryList, includes);
@@ -119,7 +126,7 @@ public class CategoryServiceImpl implements CategoryService {
     private Category getCategory(Long id) {
 
         Optional<Category> categoryOptional = categoryRepository.findById(id);
-        if(categoryOptional.isEmpty()) {
+        if (categoryOptional.isEmpty()) {
 
             throw new ResourceNotFoundException("Không tìm thấy danh mục sản phẩm");
         }

@@ -25,7 +25,7 @@ public class Cart {
     // Một giỏ hàng thuộc về một người dùng
     @OneToOne
     @JoinColumn(name = "user_id", unique = true)
-    @JsonBackReference
+    @JsonBackReference(value = "user-cart")
     private User user;
 
     // Một giỏ hàng gồm nhiều chi tiết giỏ hàng

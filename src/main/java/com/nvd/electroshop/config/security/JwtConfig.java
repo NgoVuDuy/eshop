@@ -1,6 +1,7 @@
 package com.nvd.electroshop.config.security;
 
 import com.nvd.electroshop.repository.BlackListTokenRepository;
+import com.nvd.electroshop.service.BlackListTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +16,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class JwtConfig {
 
     @Autowired
-    BlackListTokenRepository blackListTokenRepository;
+    BlackListTokenService blackListTokenService;
 
     @Value("${jwt.secretKey}")
     private String secretKey;
@@ -26,7 +27,7 @@ public class JwtConfig {
         SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HS512");
         NimbusJwtDecoder nimbusJwtDecoder = NimbusJwtDecoder.withSecretKey(secretKeySpec).macAlgorithm(MacAlgorithm.HS512).build();
 
-        return new CustomJwtDecoder(blackListTokenRepository, nimbusJwtDecoder);
+        return new CustomJwtDecoder(blackListTokenService, nimbusJwtDecoder);
 
     }
 }

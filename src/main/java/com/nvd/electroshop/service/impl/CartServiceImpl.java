@@ -16,21 +16,25 @@ import org.springframework.stereotype.Service;
 @Service
 public class CartServiceImpl implements CartService {
 
-    @Autowired
-    private CartRepository cartRepository;
+    private final CartRepository cartRepository;
+    private final GlobalService globalService;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private GlobalService globalService;
-
-    @Autowired
-    private UserRepository userRepository;
+    public CartServiceImpl(
+            CartRepository cartRepository,
+            GlobalService globalService,
+            UserRepository userRepository) {
+        this.cartRepository = cartRepository;
+        this.globalService = globalService;
+        this.userRepository = userRepository;
+    }
 
     @Override
     public Message createCart() {
 
         User user = globalService.getUserByToken();
 
-        if(cartRepository.existsByUser_Id(user.getId())) {
+        if (cartRepository.existsByUser_Id(user.getId())) {
 
             throw new ConflictException("Giỏ hàng đã tồn tại");
         }
@@ -48,7 +52,7 @@ public class CartServiceImpl implements CartService {
 
         User user = globalService.getUserByToken();
 
-        if(!cartRepository.existsByUser_Id(user.getId())) {
+        if (!cartRepository.existsByUser_Id(user.getId())) {
 
             throw new ResourceNotFoundException("Không tìm thấy giỏ hàng");
         }

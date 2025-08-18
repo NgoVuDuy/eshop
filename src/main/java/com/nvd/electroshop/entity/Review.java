@@ -23,7 +23,7 @@ public class Review {
     // Một đánh giá thuộc về một người dùng
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonBackReference
+    @JsonBackReference(value = "user-reviews")
     private User user;
 
     // Một đánh giá thuộc về một sản phẩm

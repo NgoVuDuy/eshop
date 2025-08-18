@@ -73,7 +73,7 @@ public class UserController {
 
     @PatchMapping("/update")
     //user
-    public ResponseEntity<ApiResponse<UserResponse>> updateProfile(@Valid @RequestBody UpdateUserRequest updateUserRequest) {
+    public ResponseEntity<ApiResponse<UserResponse>> updateProfile(@RequestBody UpdateUserRequest updateUserRequest) {
 
         return ResponseEntity.ok(userService.updateProfile(updateUserRequest));
     }

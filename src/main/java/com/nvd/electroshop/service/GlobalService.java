@@ -9,6 +9,7 @@ import com.nvd.electroshop.repository.CartRepository;
 public interface GlobalService {
 
     public User getUserByToken();
+    public User getUserByUsername(String username);
     public Product getProductById(Long productId);
 
     public String formatCurrency(double amount);

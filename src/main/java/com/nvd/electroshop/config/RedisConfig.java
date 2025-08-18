@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -32,7 +34,9 @@ public class RedisConfig extends CachingConfigurerSupport {
                 JsonTypeInfo.As.PROPERTY
         );
 
-        // Dùng GenericJackson2JsonRedisSerializer (ổn định, universal)
+        objectMapper.registerModule(new JavaTimeModule()); // hỗ trợ LocalDate, LocalDateTime
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS); // serialize thành ISO-8601
+
         GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
 
         RedisTemplate<String, Object> template = new RedisTemplate<>();

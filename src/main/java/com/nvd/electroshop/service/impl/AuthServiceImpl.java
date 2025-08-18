@@ -19,6 +19,8 @@ import com.nvd.electroshop.repository.AuthRepository;
 import com.nvd.electroshop.repository.BlackListTokenRepository;
 import com.nvd.electroshop.service.AuthService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -34,10 +36,13 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final BlackListTokenRepository blackListTokenRepository;
 
-    public AuthServiceImpl(AuthRepository authRepository, PasswordEncoder passwordEncoder, BlackListTokenRepository blackListTokenRepository) {
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    public AuthServiceImpl(RedisTemplate<String, Object> redisTemplate, AuthRepository authRepository, PasswordEncoder passwordEncoder, BlackListTokenRepository blackListTokenRepository) {
         this.authRepository = authRepository;
         this.passwordEncoder = passwordEncoder;
         this.blackListTokenRepository = blackListTokenRepository;
+        this.redisTemplate = redisTemplate;
     }
 
     @Value("${jwt.secretKey}")
@@ -112,7 +117,9 @@ public class AuthServiceImpl implements AuthService {
                         .expirationTime(expirationTime)
                         .build();
 
-                blackListTokenRepository.save(blackListToken);
+                // Xóa key khỏi redis
+                redisTemplate.delete("blacklist-tokens::" + idToken);
+                blackListTokenRepository.save(blackListToken); // Lưu vào database
 
             } catch (ParseException e) {
                 throw new RuntimeException("Lỗi parse token");
@@ -215,7 +222,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
 
-    // Xác thực token
+    // Xác thực token - test
     public ApiResponse<VerifyResponse> verifyToken(VerifyRequest verifyRequest) {
 
         String token = verifyRequest.getToken();

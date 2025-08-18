@@ -1,18 +1,23 @@
 package com.nvd.electroshop.config.security;
 
 import com.nvd.electroshop.repository.BlackListTokenRepository;
+import com.nvd.electroshop.service.BlackListTokenService;
+import lombok.extern.java.Log;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
+import java.util.UUID;
+
+
 public class CustomJwtDecoder implements JwtDecoder {
 
-    private final BlackListTokenRepository blackListTokenRepository;
+    private final BlackListTokenService blackListTokenService;
     private final NimbusJwtDecoder nimbusJwtDecoder;
 
-    public CustomJwtDecoder(BlackListTokenRepository blackListTokenRepository, NimbusJwtDecoder nimbusJwtDecoder) {
-        this.blackListTokenRepository = blackListTokenRepository;
+    public CustomJwtDecoder(BlackListTokenService blackListTokenService, NimbusJwtDecoder nimbusJwtDecoder) {
+        this.blackListTokenService = blackListTokenService;
         this.nimbusJwtDecoder = nimbusJwtDecoder;
     }
 
@@ -23,8 +28,9 @@ public class CustomJwtDecoder implements JwtDecoder {
         // Lấy token id
         String jti = jwt.getClaimAsString("jti");
         // Kiểm tra có trong blacklist không
-        if(blackListTokenRepository.existsById(jti)) {
+        boolean isBlackListToken = blackListTokenService.isBackListToken(jti);
 
+        if (isBlackListToken) {
             throw new JwtException("Token không khả dụng");
         }
 

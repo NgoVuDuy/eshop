@@ -16,6 +16,7 @@ import com.nvd.electroshop.repository.ProductRepository;
 import com.nvd.electroshop.service.CartItemService;
 import com.nvd.electroshop.service.GlobalService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +30,7 @@ public class CartItemServiceImpl implements CartItemService {
 
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
-    private final GlobalService globalService;
+    public final GlobalService globalService;
 
     private final CartItemMapper cartItemMapper;
 
@@ -67,6 +68,7 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
+    @Cacheable(value = "user-cartItems", key = "#root.methodName + '_' + (#includes != null ? #includes.toString() : 'null') + '_' + #root.target.globalService.getUserByToken().username")
     public ApiResponse<CartItemResponse> createUserCartItem(CartItemRequest cartItemRequest) {
 
         User user = globalService.getUserByToken(); // Lấy người dùng

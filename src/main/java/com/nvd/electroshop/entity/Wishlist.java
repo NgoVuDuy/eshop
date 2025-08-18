@@ -22,7 +22,7 @@ public class Wishlist {
     // Một danh sách yêu thích thuộc về một người dùng
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonBackReference
+    @JsonBackReference(value = "user-wishlists")
     private User user;
 
     // Một danh sách yêu thích thuộc về một sản phẩm

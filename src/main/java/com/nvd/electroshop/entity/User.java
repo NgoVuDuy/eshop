@@ -33,22 +33,22 @@ public class User {
 
     // Một người dùng có một giỏ hàng
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonManagedReference(value = "user-cart")
     private Cart cart;
 
     // Một người dùng có nhiều đơn hàng
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonManagedReference(value = "user-orders")
     private List<Order> orders;
 
     // Một người dùng có nhiều đánh giá sản phẩm
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonManagedReference(value = "user-reviews")
     private List<Review> reviews;
 
     // Một người dùng yêu thích nhiều sản phẩm
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonManagedReference(value = "user-wishlists")
     private List<Wishlist> wishlists;
 
     // Trạng thái tài khoàn

@@ -34,7 +34,7 @@ public class Order {
     // Một đơn hàng thuộc về một người dùng
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonBackReference
+    @JsonBackReference(value = "user-orders")
     private User user;
 
     // Một đơn hàng gồm nhiều chi tiết đơn hàng
