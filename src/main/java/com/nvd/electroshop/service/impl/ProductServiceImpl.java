@@ -1,17 +1,13 @@
 package com.nvd.electroshop.service.impl;
 
-import com.nvd.electroshop.dto.request.AttributeProductRequest;
 import com.nvd.electroshop.dto.request.ProductRequest;
 import com.nvd.electroshop.dto.response.*;
 import com.nvd.electroshop.entity.*;
 import com.nvd.electroshop.exception.ResourceNotFoundException;
 import com.nvd.electroshop.mapper.*;
-import com.nvd.electroshop.repository.AttributeProductRepository;
-import com.nvd.electroshop.repository.AttributeRepository;
-import com.nvd.electroshop.repository.BrandRepository;
+
 import com.nvd.electroshop.repository.ProductRepository;
 import com.nvd.electroshop.service.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -50,7 +46,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @Cacheable(value = "products", key = "'all'")
+    @Cacheable(value = "all-products", key = "(#includes != null ? #includes.toString() : '[null]')")
     public ApiResponse<List<ProductResponse>> getAllProducts(List<String> includes) {
 
         List<Product> products = productRepository.findAll();
@@ -60,16 +56,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @Cacheable(value = "products", key = "#id")
-    public ApiResponse<ProductResponse> getProductById(Long id, List<String> includes) {
-
-        Product product = getProduct(id);
-        ProductResponse productResponse = productMapper.mapToProductResponse(product, includes);
-
-        return new ApiResponse<>(1, productResponse);
-    }
-
-    @Override
+    @CacheEvict(value = "all-products", allEntries = true)
     public ApiResponse<ProductResponse> createProduct(ProductRequest productRequest) {
 
         Product product = productMapper.mapToProduct(productRequest);
@@ -81,9 +68,19 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable(value = "product-item", key = "(#includes != null ? #includes.toString() : '[null]') + '_' + #id")
+    public ApiResponse<ProductResponse> getProductById(Long id, List<String> includes) {
+
+        Product product = getProduct(id);
+        ProductResponse productResponse = productMapper.mapToProductResponse(product, includes);
+
+        return new ApiResponse<>(1, productResponse);
+    }
+
+    @Override
     @Caching(evict = {
-            @CacheEvict(value = "products", key = "'all'"),
-            @CacheEvict(value = "products", key = "#id")
+            @CacheEvict(value = "all-products", allEntries = true),
+            @CacheEvict(value = "product-item", allEntries = true)
     })
     public ApiResponse<ProductResponse> updateProduct(Long id, ProductRequest productRequest) {
 
@@ -104,8 +101,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Caching(evict = {
-            @CacheEvict(value = "products", key = "'all'"),
-            @CacheEvict(value = "products", key = "#id")
+            @CacheEvict(value = "all-products", allEntries = true),
+            @CacheEvict(value = "product-item", allEntries = true)
     })
     public Message deleteProduct(Long id) {
 

@@ -1,0 +1,53 @@
+version: "3.9"
+services:
+
+  #  my app
+  app:
+    build: .
+    container_name: eshop-springboot-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://eshop-mysql:3306/eshop
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 12345678
+      SPRING_DATA_REDIS_HOST: eshop-redis
+      SPRING_DATA_REDIS_PORT: 6379
+    depends_on:
+      - mysql
+      - redis
+
+  #my sql
+  mysql:
+    image: mysql:8.0
+    container_name: eshop-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345678
+      MYSQL_DATABASE: eshop
+    ports:
+      - "3307:3306"   # cổng host 3307 -> container 3306
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  #redis
+  redis:
+    image: redis:7.2
+    container_name: eshop-redis
+    ports:
+      - "6379:6379"
+
+  liquibase:
+    image: liquibase
+    container_name: eshop-liquibase
+    depends_on:
+      - mysql
+    environment:
+      LIQUIBASE_URL: jdbc:mysql://eshop-mysql:3306/eshop
+      LIQUIBASE_USERNAME: root
+      LIQUIBASE_PASSWORD: 12345678
+      LIQUIBASE_CHANGELOG_FILE: /liquibase/changelog/master.xml
+    volumes:
+      - ./src/main/resources/db/changelog:/liquibase/changelog
+
+volumes:
+  mysql_data:
