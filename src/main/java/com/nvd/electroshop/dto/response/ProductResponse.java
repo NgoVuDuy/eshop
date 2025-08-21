@@ -1,7 +1,6 @@
 package com.nvd.electroshop.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.nvd.electroshop.entity.AttributeProduct;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

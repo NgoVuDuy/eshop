@@ -11,12 +11,15 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://eshop-mysql:3306/eshop
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: 12345678
+
       SPRING_DATA_REDIS_HOST: eshop-redis
       SPRING_DATA_REDIS_PORT: 6379
+
+      SPRING_DATA_ELASTICSEARCH_CLIENT_URIS: http://eshop-elasticsearch:9200
     depends_on:
       - mysql
       - redis
-
+      - elasticsearch
   #my sql
   mysql:
     image: mysql:8.0
@@ -36,6 +39,7 @@ services:
     ports:
       - "6379:6379"
 
+  #liquibase
   liquibase:
     image: liquibase
     container_name: eshop-liquibase
@@ -49,5 +53,32 @@ services:
     volumes:
       - ./src/main/resources/db/changelog:/liquibase/changelog
 
+    # elasticsearch
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.1.2
+    container_name: eshop-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data   # ✅ mount volume để dữ liệu không mất khi restart
+
+
+  # kibana
+  kibana:
+    image: docker.elastic.co/kibana/kibana:9.1.2
+    container_name: eshop-kibana
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://eshop-elasticsearch:9200   # ✅ chỉ định ES host
+    depends_on:
+      - elasticsearch   # ✅ Kibana cần ES chạy trước
 volumes:
   mysql_data:
+  es_data:   # ✅ volume mới cho elasticsearch

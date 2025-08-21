@@ -2,6 +2,8 @@ package com.nvd.electroshop.service.impl;
 
 import com.nvd.electroshop.dto.request.ProductRequest;
 import com.nvd.electroshop.dto.response.*;
+import com.nvd.electroshop.elasticsearch.model.ProductSearch;
+import com.nvd.electroshop.elasticsearch.repository.ProductSearchRepository;
 import com.nvd.electroshop.entity.*;
 import com.nvd.electroshop.exception.ResourceNotFoundException;
 import com.nvd.electroshop.mapper.*;
@@ -13,10 +15,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -29,13 +28,16 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryMapper categoryMapper;
     private final AttributeProductMapper attributeProductMapper;
 
+    private final ProductSearchRepository productSearchRepository;
+
     public ProductServiceImpl(
             ProductRepository productRepository,
             ProductMapper productMapper,
             ReviewMapper reviewMapper,
             BrandMapper brandMapper,
             CategoryMapper categoryMapper,
-            AttributeProductMapper attributeProductMapper
+            AttributeProductMapper attributeProductMapper,
+            ProductSearchRepository productSearchRepository
     ) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
@@ -43,6 +45,7 @@ public class ProductServiceImpl implements ProductService {
         this.brandMapper = brandMapper;
         this.categoryMapper = categoryMapper;
         this.attributeProductMapper = attributeProductMapper;
+        this.productSearchRepository = productSearchRepository;
     }
 
     @Override
@@ -61,6 +64,19 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = productMapper.mapToProduct(productRequest);
         product = productRepository.save(product);
+
+        // Thêm sản phẩm vào elasticsearch
+        Set<Category> categories = product.getCategories();
+
+        List<String> categoriesList = categories.stream().map(Category::getName).toList();
+        ProductSearch productSearch = ProductSearch.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .brand(product.getBrand().getName())
+                .categories(categoriesList)
+                .build();
+
+        productSearchRepository.save(productSearch);
 
         ProductResponse productResponse = productMapper.mapToProductResponse(product);
 
