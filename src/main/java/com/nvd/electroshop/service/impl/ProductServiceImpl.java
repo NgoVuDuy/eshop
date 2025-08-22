@@ -15,6 +15,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.*;
 
 @Service
@@ -66,16 +67,7 @@ public class ProductServiceImpl implements ProductService {
         product = productRepository.save(product);
 
         // Thêm sản phẩm vào elasticsearch
-        Set<Category> categories = product.getCategories();
-
-        List<String> categoriesList = categories.stream().map(Category::getName).toList();
-        ProductSearch productSearch = ProductSearch.builder()
-                .id(product.getId())
-                .name(product.getName())
-                .brand(product.getBrand().getName())
-                .categories(categoriesList)
-                .build();
-
+        ProductSearch productSearch = productMapper.mapToProductSearch(product);
         productSearchRepository.save(productSearch);
 
         ProductResponse productResponse = productMapper.mapToProductResponse(product);
@@ -105,6 +97,19 @@ public class ProductServiceImpl implements ProductService {
 
         product = productRepository.save(product);
 
+        // Cập nhật lại trên elasticsearch
+        Optional<ProductSearch> productSearchOptional = productSearchRepository.findById(id);
+
+        if(productSearchOptional.isEmpty()) {
+
+            throw new ResourceNotFoundException("Không tìm thấy sản phẩm trên ElasticSearch");
+        }
+        ProductSearch productSearch = productSearchOptional.get();
+
+        productSearch = productMapper.mapToProductSearch(product, productSearch);
+        productSearchRepository.save(productSearch);
+
+
         ProductResponse productResponse = productMapper.mapToProductResponse(product);
         return new ApiResponse<>(1, productResponse);
     }
@@ -122,11 +127,12 @@ public class ProductServiceImpl implements ProductService {
     })
     public Message deleteProduct(Long id) {
 
-        Product product = getProduct(id);
-        productRepository.delete(product);
+        productRepository.deleteById(id);
+        productSearchRepository.deleteById(id);
 
         return new Message(1, "Xóa sản phẩm thành công");
     }
+
 
     @Override
     public ApiResponse<List<ReviewResponse>> getReviewsByProductId(Long id) {

@@ -3,6 +3,7 @@ package com.nvd.electroshop.mapper;
 import com.nvd.electroshop.dto.request.AttributeProductRequest;
 import com.nvd.electroshop.dto.request.ProductRequest;
 import com.nvd.electroshop.dto.response.*;
+import com.nvd.electroshop.elasticsearch.model.ProductSearch;
 import com.nvd.electroshop.entity.*;
 import com.nvd.electroshop.exception.ResourceNotFoundException;
 import com.nvd.electroshop.repository.BrandRepository;
@@ -150,5 +151,33 @@ public class ProductMapper {
         product.getAttributeProducts().addAll(attributeProductList);
 
         return product;
+    }
+    // search
+    public ProductSearch mapToProductSearch(Product product) {
+
+        return mapToProductSearch(product, null);
+    }
+
+    public ProductSearch mapToProductSearch(Product product, ProductSearch productSearchDetails) {
+
+        ProductSearch productSearch = Objects.requireNonNullElseGet(productSearchDetails, ProductSearch::new);
+        Optional<Brand> brandOptional = brandRepository.findById(product.getBrand().getId());
+
+        if(brandOptional.isEmpty()) {
+
+            throw new ResourceNotFoundException("Không tìm thấy hãng");
+
+        }
+        Brand brand = brandOptional.get();
+
+        List<Category> categoryList = new ArrayList<>(product.getCategories());
+        List<String> categoryNameList = categoryList.stream().map(Category::getName).toList();
+
+        productSearch.setId(product.getId());
+        productSearch.setBrand(brand.getName());
+        productSearch.setName(product.getName());
+        productSearch.setCategories(categoryNameList);
+
+        return productSearch;
     }
 }
