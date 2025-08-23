@@ -7,13 +7,13 @@ import com.nvd.electroshop.dto.request.ProductImageRequest;
 import com.nvd.electroshop.dto.response.ApiResponse;
 import com.nvd.electroshop.dto.response.Message;
 import com.nvd.electroshop.dto.response.ProductImageResponse;
+import com.nvd.electroshop.dto.response.ProductResponse;
 import com.nvd.electroshop.entity.Product;
 import com.nvd.electroshop.entity.ProductImage;
 import com.nvd.electroshop.mapper.ProductImageMapper;
 import com.nvd.electroshop.repository.ProductImageRepository;
 import com.nvd.electroshop.service.GlobalService;
 import com.nvd.electroshop.service.ProductImageService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,7 +44,6 @@ public class ProductImageServiceImpl implements ProductImageService {
         Product product = globalService.getProductById(productImageRequest.getProductId()); // Lấy sản phẩm cần thêm hình
 
         List<MultipartFile> files = productImageRequest.getProductImageFiles(); // Lấy các file hình
-//        List<ProductImage> productImageList = new ArrayList<>();
 
         for (MultipartFile file : files) {
 
@@ -68,7 +67,6 @@ public class ProductImageServiceImpl implements ProductImageService {
 
                 productImage = productImageRepository.save(productImage); // Lưu url vào db
 
-//                productImageList.add(productImage);
 
                 ProductImageResponse productImageResponse = productImageMapper.mapToProductImageResponse(productImage);
 
@@ -83,9 +81,6 @@ public class ProductImageServiceImpl implements ProductImageService {
             }
         }
 
-        // Kết quả trả về
-//        List<ProductImageResponse> productImageResponseList = productImageMapper.mapToProductImageResponseList(productImageList);
-//        return new ApiResponse<>(1, productImageResponseList);
     }
 
     @Override

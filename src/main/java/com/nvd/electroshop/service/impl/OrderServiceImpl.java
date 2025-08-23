@@ -16,11 +16,11 @@ import com.nvd.electroshop.exception.ConflictException;
 import com.nvd.electroshop.exception.ResourceNotFoundException;
 import com.nvd.electroshop.mapper.OrderItemMapper;
 import com.nvd.electroshop.mapper.OrderMapper;
-import com.nvd.electroshop.mapper.ProductMapper;
 import com.nvd.electroshop.repository.OrderRepository;
 import com.nvd.electroshop.repository.ProductRepository;
 import com.nvd.electroshop.service.GlobalService;
 import com.nvd.electroshop.service.OrderService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -34,7 +34,6 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemMapper orderItemMapper;
     private final OrderMapper orderMapper;
-    private final ProductMapper productMapper;
     private final ProductRepository productRepository;
 
     public OrderServiceImpl(
@@ -42,14 +41,12 @@ public class OrderServiceImpl implements OrderService {
             OrderRepository orderRepository,
             OrderItemMapper orderItemMapper,
             OrderMapper orderMapper,
-            ProductMapper productMapper,
             ProductRepository productRepository
     ) {
         this.globalService = globalService;
         this.orderRepository = orderRepository;
         this.orderItemMapper = orderItemMapper;
         this.orderMapper = orderMapper;
-        this.productMapper = productMapper;
         this.productRepository = productRepository;
     }
 

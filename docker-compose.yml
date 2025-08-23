@@ -68,7 +68,6 @@ services:
     volumes:
       - es_data:/usr/share/elasticsearch/data   # ✅ mount volume để dữ liệu không mất khi restart
 
-
   # kibana
   kibana:
     image: docker.elastic.co/kibana/kibana:9.1.2
@@ -81,4 +80,4 @@ services:
       - elasticsearch   # ✅ Kibana cần ES chạy trước
 volumes:
   mysql_data:
-  es_data:   # ✅ volume mới cho elasticsearch
+  es_data:

@@ -1,0 +1,108 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="
+                   http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="seed-attributes" author="ASUS (generated)">
+        <insert tableName="attributes">
+            <column name="id" valueNumeric="1"/>
+            <column name="name" value="Hệ điều hành"/>
+            <column name="unit" value="null"/>
+
+        </insert>
+
+        <insert tableName="attributes">
+            <column name="id" valueNumeric="2"/>
+            <column name="name" value="Chip xử lý (CPU)"/>
+            <column name="unit" value="null"/>
+
+        </insert>
+
+        <insert tableName="attributes">
+            <column name="id" valueNumeric="3"/>
+            <column name="name" value="Chip đồ họa (GPU)"/>
+            <column name="unit" value="null"/>
+
+        </insert>
+
+        <insert tableName="attributes">
+            <column name="id" valueNumeric="4"/>
+            <column name="name" value="GAM"/>
+            <column name="unit" value="GB"/>
+
+        </insert>
+
+        <insert tableName="attributes">
+            <column name="id" valueNumeric="5"/>
+            <column name="name" value="ROM"/>
+            <column name="unit" value="GB"/>
+
+        </insert>
+
+        <insert tableName="attributes">
+            <column name="id" valueNumeric="6"/>
+            <column name="name" value="Dung tích"/>
+            <column name="unit" value="lít"/>
+
+        </insert>
+
+        <insert tableName="attributes">
+            <column name="id" valueNumeric="7"/>
+            <column name="name" value="Công suất"/>
+            <column name="unit" value="kWh/năm"/>
+
+        </insert>
+
+        <insert tableName="attributes">
+            <column name="id" valueNumeric="8"/>
+            <column name="name" value="Lồng giặt"/>
+            <column name="unit" value="null"/>
+
+        </insert>
+
+        <insert tableName="attributes">
+            <column name="id" valueNumeric="9"/>
+            <column name="name" value="Khối lượng giặt"/>
+            <column name="unit" value="Kg"/>
+
+        </insert>
+
+        <insert tableName="attributes">
+            <column name="id" valueNumeric="10"/>
+            <column name="name" value="Tốc độ quay"/>
+            <column name="unit" value="vòng/phút"/>
+
+        </insert>
+
+        <insert tableName="attributes">
+            <column name="id" valueNumeric="11"/>
+            <column name="name" value="Tốc độ quay"/>
+            <column name="unit" value="vòng/phút"/>
+
+        </insert>
+
+        <insert tableName="attributes">
+            <column name="id" valueNumeric="12"/>
+            <column name="name" value="Chất liệu viền"/>
+            <column name="unit" value="null"/>
+
+        </insert>
+
+        <insert tableName="attributes">
+            <column name="id" valueNumeric="13"/>
+            <column name="name" value="Độ phân giải"/>
+            <column name="unit" value="null"/>
+
+        </insert>
+
+        <insert tableName="attributes">
+            <column name="id" valueNumeric="14"/>
+            <column name="name" value="Kích cỡ"/>
+            <column name="unit" value="Inch"/>
+
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

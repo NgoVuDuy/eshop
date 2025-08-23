@@ -2,10 +2,14 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-<!--    <include file="001_initial_schema.xml"-->
-<!--             relativeToChangelogFile="true"/>-->
-
-    <include file="002_create_payments_table.xml"
+    <include file="001_initial_schema.xml"
              relativeToChangelogFile="true"/>
+
+    <include file="002_create_payments_table.xml" relativeToChangelogFile="true"/>
+    <include file="003_categories_seeder.xml" relativeToChangelogFile="true"/>
+    <include file="004_brands_seeder.xml" relativeToChangelogFile="true"/>
+    <include file="005_category_brand_seeder.xml" relativeToChangelogFile="true"/>
+    <include file="006_attributes_seeder.xml" relativeToChangelogFile="true"/>
+    <include file="007_products_seeder.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

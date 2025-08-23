@@ -1,0 +1,92 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="
+                   http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="seed-products" author="ASUS (generated)">
+
+        <!-- iPhone -->
+        <insert tableName="products">
+            <column name="name" value="iPhone 16 Pro Max"/>
+            <column name="price" valueNumeric="16990.112"/>
+            <column name="stock_quantity" valueNumeric="50"/>
+            <column name="brand_id" valueNumeric="1"/>
+        </insert>
+
+        <!-- Samsung -->
+        <insert tableName="products">
+            <column name="name" value="Samsung Galaxy S25 Ultra"/>
+            <column name="price" valueNumeric="14990.550"/>
+            <column name="stock_quantity" valueNumeric="70"/>
+            <column name="brand_id" valueNumeric="2"/>
+        </insert>
+
+        <!-- Vivo -->
+        <insert tableName="products">
+            <column name="name" value="Vivo X100"/>
+            <column name="price" valueNumeric="9990.999"/>
+            <column name="stock_quantity" valueNumeric="100"/>
+            <column name="brand_id" valueNumeric="3"/>
+        </insert>
+
+        <!-- MacBook -->
+        <insert tableName="products">
+            <column name="name" value="MacBook Pro M3"/>
+            <column name="price" valueNumeric="25990.750"/>
+            <column name="stock_quantity" valueNumeric="30"/>
+            <column name="brand_id" valueNumeric="4"/>
+        </insert>
+
+        <!-- Asus -->
+        <insert tableName="products">
+            <column name="name" value="Asus ROG Strix"/>
+            <column name="price" valueNumeric="20990.500"/>
+            <column name="stock_quantity" valueNumeric="45"/>
+            <column name="brand_id" valueNumeric="5"/>
+        </insert>
+
+        <!-- Lenovo -->
+        <insert tableName="products">
+            <column name="name" value="Lenovo ThinkPad X1"/>
+            <column name="price" valueNumeric="18990.333"/>
+            <column name="stock_quantity" valueNumeric="60"/>
+            <column name="brand_id" valueNumeric="6"/>
+        </insert>
+
+        <!-- Panasonic -->
+        <insert tableName="products">
+            <column name="name" value="Tủ lạnh Panasonic Lumix"/>
+            <column name="price" valueNumeric="12990.000"/>
+            <column name="stock_quantity" valueNumeric="25"/>
+            <column name="brand_id" valueNumeric="7"/>
+        </insert>
+
+        <!-- Sony -->
+        <insert tableName="products">
+            <column name="name" value="TV Sony PlayStation 5 Pro"/>
+            <column name="price" valueNumeric="7990.888"/>
+            <column name="stock_quantity" valueNumeric="150"/>
+            <column name="brand_id" valueNumeric="8"/>
+        </insert>
+
+        <!-- Extra iPhone -->
+        <insert tableName="products">
+            <column name="name" value="iPhone 15"/>
+            <column name="price" valueNumeric="12990.222"/>
+            <column name="stock_quantity" valueNumeric="40"/>
+            <column name="brand_id" valueNumeric="1"/>
+        </insert>
+
+        <!-- Extra Samsung -->
+        <insert tableName="products">
+            <column name="name" value="Samsung Galaxy Z Fold 6"/>
+            <column name="price" valueNumeric="22990.999"/>
+            <column name="stock_quantity" valueNumeric="20"/>
+            <column name="brand_id" valueNumeric="2"/>
+        </insert>
+
+    </changeSet>
+
+</databaseChangeLog>

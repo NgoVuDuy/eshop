@@ -5,6 +5,7 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import com.nvd.electroshop.component.RabbitMQProducer;
 import com.nvd.electroshop.dto.request.AuthRequest;
 import com.nvd.electroshop.dto.request.LogoutRequest;
 import com.nvd.electroshop.dto.request.RefreshTokenRequest;
@@ -37,12 +38,19 @@ public class AuthServiceImpl implements AuthService {
     private final BlackListTokenRepository blackListTokenRepository;
 
     private final RedisTemplate<String, Object> redisTemplate;
+    private final RabbitMQProducer rabbitMQProducer;
 
-    public AuthServiceImpl(RedisTemplate<String, Object> redisTemplate, AuthRepository authRepository, PasswordEncoder passwordEncoder, BlackListTokenRepository blackListTokenRepository) {
+    public AuthServiceImpl(
+            RedisTemplate<String, Object> redisTemplate,
+            AuthRepository authRepository, PasswordEncoder passwordEncoder,
+            BlackListTokenRepository blackListTokenRepository,
+            RabbitMQProducer rabbitMQProducer
+    ) {
         this.authRepository = authRepository;
         this.passwordEncoder = passwordEncoder;
         this.blackListTokenRepository = blackListTokenRepository;
         this.redisTemplate = redisTemplate;
+        this.rabbitMQProducer = rabbitMQProducer;
     }
 
     @Value("${jwt.secretKey}")
