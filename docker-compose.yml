@@ -1,14 +1,15 @@
 version: "3.9"
+
 services:
 
-  #  my app
+  #  Spring Boot app
   app:
     build: .
     container_name: eshop-springboot-app
     ports:
       - "8082:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://eshop-mysql:3306/eshop
+      SPRING_DATASOURCE_URL: jdbc:mysql://eshop-mysql:3306/eshop?useSSL=false&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: 12345678
 
@@ -21,13 +22,15 @@ services:
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: guest
       SPRING_RABBITMQ_PASSWORD: guest
-
     depends_on:
       - mysql
       - redis
       - elasticsearch
       - rabbitmq
-  #my sql
+    networks:
+      - eshop-network
+
+  # MySQL
   mysql:
     image: mysql:8.0
     container_name: eshop-mysql
@@ -35,18 +38,22 @@ services:
       MYSQL_ROOT_PASSWORD: 12345678
       MYSQL_DATABASE: eshop
     ports:
-      - "3307:3306"   # cổng host 3307 -> container 3306
+      - "3307:3306"   # Host port 3307 -> Container port 3306
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - eshop-network
 
-  #redis
+  # Redis
   redis:
     image: redis:7.2
     container_name: eshop-redis
     ports:
       - "6379:6379"
+    networks:
+      - eshop-network
 
-  #liquibase
+  # Liquibase
   liquibase:
     image: liquibase
     container_name: eshop-liquibase
@@ -59,8 +66,10 @@ services:
       LIQUIBASE_CHANGELOG_FILE: /liquibase/changelog/master.xml
     volumes:
       - ./src/main/resources/db/changelog:/liquibase/changelog
+    networks:
+      - eshop-network
 
-    # elasticsearch
+  # Elasticsearch
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:9.1.2
     container_name: eshop-elasticsearch
@@ -73,30 +82,39 @@ services:
       - "9200:9200"
       - "9300:9300"
     volumes:
-      - es_data:/usr/share/elasticsearch/data   # ✅ mount volume để dữ liệu không mất khi restart
+      - es_data:/usr/share/elasticsearch/data
+    networks:
+      - eshop-network
 
-  # kibana
+  # Kibana
   kibana:
     image: docker.elastic.co/kibana/kibana:9.1.2
     container_name: eshop-kibana
     ports:
       - "5601:5601"
     environment:
-      ELASTICSEARCH_HOSTS: http://eshop-elasticsearch:9200   # ✅ chỉ định ES host
+      ELASTICSEARCH_HOSTS: http://eshop-elasticsearch:9200
     depends_on:
-      - elasticsearch   # ✅ Kibana cần ES chạy trước
-  #rabitmq
+      - elasticsearch
+    networks:
+      - eshop-network
+
+  # RabbitMQ
   rabbitmq:
     image: rabbitmq:3-management
     container_name: eshop-rabbitmq
     ports:
       - "5672:5672"
       - "15672:15672"
+    networks:
+      - eshop-network
 
+# Volumes
 volumes:
   mysql_data:
   es_data:
 
+# Networks
 networks:
   eshop-network:
     driver: bridge
