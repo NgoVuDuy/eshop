@@ -6,7 +6,7 @@ services:
     build: .
     container_name: eshop-springboot-app
     ports:
-      - "8080:8080"
+      - "8082:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://eshop-mysql:3306/eshop
       SPRING_DATASOURCE_USERNAME: root
@@ -15,11 +15,18 @@ services:
       SPRING_DATA_REDIS_HOST: eshop-redis
       SPRING_DATA_REDIS_PORT: 6379
 
-      SPRING_DATA_ELASTICSEARCH_CLIENT_URIS: http://eshop-elasticsearch:9200
+      SPRING_ELASTICSEARCH_URIS: http://eshop-elasticsearch:9200
+
+      SPRING_RABBITMQ_HOST: eshop-rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+
     depends_on:
       - mysql
       - redis
       - elasticsearch
+      - rabbitmq
   #my sql
   mysql:
     image: mysql:8.0
@@ -78,6 +85,14 @@ services:
       ELASTICSEARCH_HOSTS: http://eshop-elasticsearch:9200   # ✅ chỉ định ES host
     depends_on:
       - elasticsearch   # ✅ Kibana cần ES chạy trước
+  #rabitmq
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: eshop-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
 volumes:
   mysql_data:
   es_data:
