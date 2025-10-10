@@ -1,15 +1,14 @@
 version: "3.9"
-
 services:
 
-  #  Spring Boot app
+  #  my app
   app:
     build: .
     container_name: eshop-springboot-app
     ports:
       - "8082:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://eshop-mysql:3306/eshop?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_URL: jdbc:mysql://eshop-mysql:3306/eshop
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: 12345678
 
@@ -22,6 +21,7 @@ services:
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: guest
       SPRING_RABBITMQ_PASSWORD: guest
+
     depends_on:
       - mysql
       - redis
@@ -29,8 +29,7 @@ services:
       - rabbitmq
     networks:
       - eshop-network
-
-  # MySQL
+  #my sql
   mysql:
     image: mysql:8.0
     container_name: eshop-mysql
@@ -38,13 +37,12 @@ services:
       MYSQL_ROOT_PASSWORD: 12345678
       MYSQL_DATABASE: eshop
     ports:
-      - "3307:3306"   # Host port 3307 -> Container port 3306
+      - "3307:3306"   # cổng host 3307 -> container 3306
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
       - eshop-network
-
-  # Redis
+  #redis
   redis:
     image: redis:7.2
     container_name: eshop-redis
@@ -53,7 +51,7 @@ services:
     networks:
       - eshop-network
 
-  # Liquibase
+  #liquibase
   liquibase:
     image: liquibase
     container_name: eshop-liquibase
@@ -69,7 +67,7 @@ services:
     networks:
       - eshop-network
 
-  # Elasticsearch
+    # elasticsearch
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:9.1.2
     container_name: eshop-elasticsearch
@@ -82,24 +80,23 @@ services:
       - "9200:9200"
       - "9300:9300"
     volumes:
-      - es_data:/usr/share/elasticsearch/data
+      - es_data:/usr/share/elasticsearch/data   # ✅ mount volume để dữ liệu không mất khi restart
     networks:
       - eshop-network
 
-  # Kibana
+  # kibana
   kibana:
     image: docker.elastic.co/kibana/kibana:9.1.2
     container_name: eshop-kibana
     ports:
       - "5601:5601"
     environment:
-      ELASTICSEARCH_HOSTS: http://eshop-elasticsearch:9200
+      ELASTICSEARCH_HOSTS: http://eshop-elasticsearch:9200   # ✅ chỉ định ES host
     depends_on:
-      - elasticsearch
+      - elasticsearch   # ✅ Kibana cần ES chạy trước
     networks:
       - eshop-network
-
-  # RabbitMQ
+  #rabitmq
   rabbitmq:
     image: rabbitmq:3-management
     container_name: eshop-rabbitmq
@@ -109,12 +106,10 @@ services:
     networks:
       - eshop-network
 
-# Volumes
 volumes:
   mysql_data:
   es_data:
 
-# Networks
 networks:
   eshop-network:
     driver: bridge
