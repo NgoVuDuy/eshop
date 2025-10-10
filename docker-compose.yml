@@ -96,3 +96,7 @@ services:
 volumes:
   mysql_data:
   es_data:
+
+networks:
+  eshop-network:
+    driver: bridge
